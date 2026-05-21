@@ -1,0 +1,47 @@
+[package]
+name = "oden_plugin_rs"
+version = "0.1.0"
+authors = ["Jonathan Nilsson <jonathan@voysys.se>"]
+edition = "2021"
+publish = false
+license = "0BSD"
+description = "Rust wrapper for the Oden plugin C API"
+repository = "https://github.com/voysys/oden_plugin_rs"
+documentation = "https://voysys.github.io/oden_plugin_rs/"
+homepage = "https://voysys.github.io/oden_plugin_rs/"
+
+[features]
+cuda = ["glam/cuda", "nalgebra/cuda"]
+glam_conversion = ["glam"]
+glam_nalgebra = ["glam_conversion", "nalgebra_conversion", "nalgebra/convert-glam024"]
+mock = ["mockall"]
+nalgebra_conversion = ["nalgebra"]
+oden_egui = ["egui", "bytemuck", "glow", "memoffset"]
+serialize = ["serde", "base64", "ciborium", "glam/serde", "nalgebra/serde-serialize"]
+strum_ex = ["strum", "strum_macros"]
+webview_user_message = ["serde", "serde_json"]
+
+[dependencies]
+assert_into = "1"
+backtrace = "0.3.67"
+base64 = { version = "0.22", optional = true }
+bytemuck = { version = "1.7", optional = true }
+ciborium = { version = "0.2", optional = true }
+egui = { version = "0.27", default-features = false, features = ["serde", "bytemuck"], optional = true }
+flume = "0.11"
+glam = { version = "0.24", optional = true }
+glow = { version = "0.13", optional = true }
+inherent = "1"
+libc = "0.2"
+log = "0.4"
+memoffset = { version = "0.9", optional = true }
+mockall = { version = "0.11", optional = true }
+nalgebra = { version = "0.32", optional = true }
+paste = "1"
+rustc_version_runtime = "0.3"
+serde = { version = "1", features = ["derive"], optional = true }
+serde_json = { version = "1", optional = true }
+strum = { version = "0.26", optional = true }
+strum_macros = { version = "0.26", optional = true }
+zerocopy = "~0.6.6"
+

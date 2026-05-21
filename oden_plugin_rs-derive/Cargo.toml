@@ -1,0 +1,19 @@
+[package]
+name = "oden_plugin_rs-derive"
+version = "0.1.0"
+authors = ["Jonathan Nilsson <jonathan@voysys.se>"]
+edition = "2021"
+license = "0BSD"
+description = "Derive macros for oden_plugin_rs"
+repository = "https://github.com/voysys/oden_plugin_rs"
+documentation = "https://voysys.github.io/oden_plugin_rs/"
+homepage = "https://voysys.github.io/oden_plugin_rs/"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+heck = "0.4"
+proc-macro2 = "1"
+quote = "1"
+syn = "1"
