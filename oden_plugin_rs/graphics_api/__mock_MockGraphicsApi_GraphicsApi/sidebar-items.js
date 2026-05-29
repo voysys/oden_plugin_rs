@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["__camera_gl_tex_id"]};

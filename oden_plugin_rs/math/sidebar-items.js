@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["closest_point_between_rays","get_rotation_xyz","mult_matrix","project_camera"],"struct":["Matrix4","Quat","Ray","Uuid","Vec2","Vec2i","Vec3","Vec4"]};
