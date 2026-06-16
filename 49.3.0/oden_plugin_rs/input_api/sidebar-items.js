@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PowerState"],"fn":["add_gamepad_mapping","gamepad","gamepad_state","get_power_info","is_joystick_present","joystick_state"],"struct":["Gamepad"]};

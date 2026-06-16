@@ -1,0 +1,68 @@
+# oden_plugin_rs
+
+> Rust wrapper for the Oden plugin C API. Write Oden plugins in Rust against a
+> safe, idiomatic API.
+
+Latest release: 49.3.0
+
+API methods live as inherent methods on the `*Params` structs (`InitParams`,
+`UpdateParams`, `GuiParams`, ...). Call them directly on the `api` value passed
+to each `OdenPlugin` method; you do not need to import the `*Api` traits, and
+importing them only yields unused-import warnings.
+
+## Add the crate
+
+```toml
+# Latest
+oden_plugin_rs = { git = "https://github.com/voysys/oden_plugin_rs", branch = "master" }
+
+# Pinned to a release
+oden_plugin_rs = { git = "https://github.com/voysys/oden_plugin_rs", tag = "v49.3.0" }
+```
+
+## Hello world
+
+```rust
+use oden_plugin_rs::{
+    math::{Vec3, Vec4},
+    register_plugin, GuiParams, InitParams, OdenPlugin, ShutdownParams, UpdateParams,
+};
+
+struct State;
+
+impl OdenPlugin for State {
+    fn init(_api: &InitParams) -> Self {
+        State
+    }
+
+    fn shutdown(self, _api: &ShutdownParams) {}
+
+    fn update(&mut self, api: &UpdateParams) {
+        api.im_draw_add_text(
+            "Hello World!",
+            Vec3::xyz(-1.0, 0.0, -2.0),
+            Vec3::xyz(0.0, 0.3, 0.0),
+            Vec3::xyz(1.0, 0.0, 0.0),
+            Vec4::rgba(0.8, 0.8, 0.8, 1.0),
+            0,
+        );
+    }
+
+    fn gui(&mut self, api: &GuiParams) {
+        api.label("Hello World!");
+    }
+}
+
+register_plugin!(
+    "Hello World from Rust",
+    "185d4603-e803-4fa2-9f56-266782cf2e98",
+    State
+);
+```
+
+## Key pages
+
+- Documentation (latest): https://voysys.github.io/oden_plugin_rs/latest/oden_plugin_rs/index.html
+- `OdenPlugin` trait: https://voysys.github.io/oden_plugin_rs/latest/oden_plugin_rs/trait.OdenPlugin.html
+- Repository: https://github.com/voysys/oden_plugin_rs
+- Runnable examples: https://github.com/voysys/oden_plugin_rs/tree/master/examples
