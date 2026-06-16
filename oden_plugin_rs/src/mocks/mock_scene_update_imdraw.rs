@@ -440,6 +440,8 @@ mockall::mock! {
         fn set_camera_crop(&self, entity: &str, stream: i32, crop: &crate::CameraCropData) -> Result<(), SceneParamError>;
         fn camera_hard_crop(&self, entity: &str, stream: i32) -> Result<Vec4, SceneParamError>;
         fn set_camera_hard_crop(&self, entity: &str, stream: i32, crop: &Vec4) -> Result<(), SceneParamError>;
+        fn drop_detector_timeout(&self, entity: &str, stream: i32) -> Result<f32, SceneParamError>;
+        fn set_drop_detector_timeout(&self, entity: &str, stream: i32, timeout_ms: f32) -> Result<(), SceneParamError>;
         fn raw_record_folder(&self) -> Result<String, crate::SceneParamError>;
         fn set_raw_record_folder(&self, folder_path: &str) -> Result<(), crate::SceneParamError>;
         fn virtual_camera_render_only_uuids(

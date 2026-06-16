@@ -857,6 +857,13 @@ pub trait SceneApi {
         stream: i32,
         crop: &Vec4,
     ) -> Result<(), SceneParamError>;
+    fn drop_detector_timeout(&self, entity: &str, stream: i32) -> Result<f32, SceneParamError>;
+    fn set_drop_detector_timeout(
+        &self,
+        entity: &str,
+        stream: i32,
+        timeout_ms: f32,
+    ) -> Result<(), SceneParamError>;
     fn entity_scale(&self, entity: &str) -> Result<Vec3, SceneParamError>;
     fn set_entity_scale(&self, entity: &str, scale: &Vec3) -> Result<(), SceneParamError>;
     fn raw_record_folder(&self) -> Result<String, SceneParamError>;
@@ -5353,6 +5360,50 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the set_camera_hard_crop function");
+                }
+            }
+
+            pub fn drop_detector_timeout(&self, entity: &str, stream: i32) -> Result<f32, $crate::SceneParamError> {
+                if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
+                    let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
+
+                    let mut param = $crate::plugin_h::OdenSceneParamDropDetectorTimeout {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeDropDetectorTimeout,
+                        next: std::ptr::null_mut(),
+                        entityId: entity_id.as_ptr(),
+                        streamIndex: stream,
+                        timeoutMs: 0.0,
+                    };
+
+                    let res = unsafe { get_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(param.timeoutMs),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the drop_detector_timeout function");
+                }
+            }
+
+            pub fn set_drop_detector_timeout(&self, entity: &str, stream: i32, timeout_ms: f32) -> Result<(), $crate::SceneParamError> {
+                if let Some(set_scene_param) = unsafe { (*self.inner).setSceneParam } {
+                    let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
+
+                    let mut param = $crate::plugin_h::OdenSceneParamDropDetectorTimeout {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeDropDetectorTimeout,
+                        next: std::ptr::null_mut(),
+                        entityId: entity_id.as_ptr(),
+                        streamIndex: stream,
+                        timeoutMs: timeout_ms,
+                    };
+
+                    let res = unsafe { set_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(()),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the set_drop_detector_timeout function");
                 }
             }
 

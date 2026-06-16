@@ -1,0 +1,17 @@
+[package]
+name = "webview_shared"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[features]
+
+[dependencies]
+oden_plugin_rs = { path = "../../../projs/oden_plugin_rs", features = [
+    "serialize",
+    "glam_conversion",
+    "webview_user_message",
+] }
+rustc_version_runtime = "0.3"
+[workspace]
+members = []

@@ -1,0 +1,15 @@
+[package]
+name = "hello_world_rs"
+version = "0.1.0"
+authors = ["Torkel Danielsson <torkel@voysys.se>"]
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+oden_plugin_rs = { path = "../../oden_plugin_rs" }
+
+[workspace]
+members = []

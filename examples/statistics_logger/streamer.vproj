@@ -1,0 +1,40 @@
+config : {
+    scene_manager : {
+        next_scene_id : 1;
+        scenes : ( {
+                scene_id : 0;
+                uuid : "b64c13e4-cecd-4245-bc98-8a2367968f52";
+                root_entity : {
+                    uuid : "b0c6b063-18c2-4778-cf49-129de63ba7c6";
+                    children : ( {
+                            uuid : "ed1a72eb-8a75-4d21-6332-3e248bd6a54c";
+                            type : "encoder_test";
+                        } );
+                };
+            } );
+    };
+    stream_settings : {
+        bandwidth_control : {
+            high : {
+                bytes_in_flight_pid : {
+                    target : 0.5;
+                };
+            };
+        };
+        type : "realtime_nvenc_gstreamer";
+        net_settings : {
+            links : ( {
+                } );
+        };
+        encoder_settings : {
+            use_custom_resolution : true;
+            height : 1088;
+            color_format : "y_cb_cr_hd_full";
+            intra_refresh : true;
+            codec : "hevc";
+            preset : "low_latency_high_performance";
+            rate_control_mode : "cbr";
+        };
+    };
+    background_behaviour : "hide";
+};

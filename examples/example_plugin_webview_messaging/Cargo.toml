@@ -1,0 +1,16 @@
+[package]
+name = "example_plugin_webview_messaging"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+oden_plugin_rs = { path = "../../oden_plugin_rs", features = ["serialize", "webview_user_message"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[workspace]
+members = []

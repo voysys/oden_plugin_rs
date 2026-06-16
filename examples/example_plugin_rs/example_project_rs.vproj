@@ -1,0 +1,75 @@
+config : {
+    scene_manager : {
+        next_scene_id : 1;
+        scenes : ( {
+                scene_id : 0;
+                uuid : "60ccf443-f65a-4263-151c-ceba20a393e9";
+                root_entity : {
+                    uuid : "9a3b3d17-2aca-4757-0932-66cfca85628b";
+                    children : ( {
+                            uuid : "1dad50f4-e41c-4ac5-5063-1315201d2465";
+                            type : "plugin_entity";
+                            type_id : "25d0135f-51e3-418f-a049-2ae36f87905b";
+                            type_name : "Example Rust";
+                            options : ( {
+                                    key : "log_show_module_path";
+                                    type : "int32";
+                                    data : 0;
+                                }, {
+                                    key : "log_show_high_res_timestamp";
+                                    type : "int32";
+                                    data : 0;
+                                }, {
+                                    key : "log_level";
+                                    type : "int32";
+                                    data : 2;
+                                } );
+                        }, {
+                            id : "My Video Entity Name";
+                            uuid : "b180d0e3-4745-42be-dcaf-7b5fbd894c77";
+                            type : "panorama_video";
+                            pv : {
+                                camera_rig : {
+                                    views : ( {
+                                            no : 1;
+                                            k : [ 1.5, 0.0, 0.0, 0.0, 0.0 ];
+                                            max_theta : 3.141593;
+                                        } );
+                                };
+                                streams : ( {
+                                        id : 1;
+                                        uuid : "222697e5-785a-4474-5a06-850f08029158";
+                                        color : [ 0.498752, 0.980392, 0.303729, 1.0 ];
+                                        type : "video";
+                                        width : 1280;
+                                        height : 720;
+                                        exposure_algo : {
+                                            regions : ( {
+                                                    left : [ 0.0, 0.0 ];
+                                                    right : [ 0.0, 1.0 ];
+                                                } );
+                                        };
+                                        capture : {
+                                            impl : "gstreamer";
+                                            pipeline : "videotestsrc pattern=0 ! video/x-raw, width=1280, height=720";
+                                            use_nvdec : false;
+                                            use_sync : true;
+                                            gui_settings : {
+                                                type : "video_test_src";
+                                            };
+                                        };
+                                    } );
+                            };
+                        } );
+                };
+            } );
+    };
+    plugin_dll_path : "target/debug";
+    stream_settings : {
+        type : "realtime_nvenc_gstreamer";
+        net_settings : {
+            links : ( {
+                } );
+        };
+    };
+};

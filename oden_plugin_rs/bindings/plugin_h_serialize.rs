@@ -1837,6 +1837,7 @@ pub enum OdenSceneParamType_e {
     OdenSceneParamTypeEntityScale = 43,
     OdenSceneParamTypeBackgroundColor = 44,
     OdenSceneParamTypeClearBackgroundColor = 45,
+    OdenSceneParamTypeDropDetectorTimeout = 46,
     OdenSceneParamTypeMaxEnum = 2147483647,
 }
 pub use self::OdenSceneParamType_e as OdenSceneParamType;
@@ -2750,6 +2751,25 @@ impl Default for OdenSceneParamClearBackgroundColor_s {
     }
 }
 pub type OdenSceneParamClearBackgroundColor = OdenSceneParamClearBackgroundColor_s;
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct OdenSceneParamDropDetectorTimeout_s {
+    pub type_: OdenSceneParamType,
+    pub next: *mut ::std::os::raw::c_void,
+    pub entityId: *const ::std::os::raw::c_char,
+    pub streamIndex: i32,
+    pub timeoutMs: f32,
+}
+impl Default for OdenSceneParamDropDetectorTimeout_s {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type OdenSceneParamDropDetectorTimeout = OdenSceneParamDropDetectorTimeout_s;
 pub type OdenGetHorizonFunc = ::std::option::Option<
     unsafe extern "C" fn(entity: *const ::std::os::raw::c_char, horizon: *mut OdenVec3) -> bool,
 >;
