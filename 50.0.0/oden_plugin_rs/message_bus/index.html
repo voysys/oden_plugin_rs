@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Generic 1↔N message bus shared between plugins."><title>oden_plugin_rs::message_bus - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="oden_plugin_rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"><style>
+.oden-version-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.85rem;
+}
+.oden-version-picker label {
+    color: var(--sidebar-link-color, inherit);
+}
+.oden-version-picker select {
+    flex: 1;
+    min-width: 0;
+}
+</style>
+<script>
+(function () {
+    var CURRENT = "50.0.0";
+    function init() {
+        var path = location.pathname;
+        var marker = "/" + CURRENT + "/";
+        var idx = path.indexOf(marker);
+        if (idx === -1) {
+            return;
+        }
+        var root = path.slice(0, idx + 1);
+        var rest = path.slice(idx + marker.length);
+        fetch(root + "versions.json", { cache: "no-cache" })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (versions) {
+                if (!Array.isArray(versions) || versions.length === 0) {
+                    return;
+                }
+                var picker = document.createElement("div");
+                picker.className = "oden-version-picker";
+                var label = document.createElement("label");
+                label.setAttribute("for", "oden-version-select");
+                label.textContent = "Version";
+                var select = document.createElement("select");
+                select.id = "oden-version-select";
+                versions.forEach(function (version) {
+                    var option = document.createElement("option");
+                    option.value = version;
+                    option.textContent = version;
+                    if (version === CURRENT) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                select.addEventListener("change", function () {
+                    location.href = root + encodeURIComponent(select.value) + "/" + rest;
+                });
+                picker.appendChild(label);
+                picker.appendChild(select);
+                var host = document.querySelector(".sidebar-crate")
+                    || document.querySelector("nav.sidebar")
+                    || document.querySelector(".sidebar");
+                if (host) {
+                    host.appendChild(picker);
+                }
+            })
+            .catch(function () {});
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>
+
+</head><body class="rustdoc mod"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module message_bus</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../oden_plugin_rs/index.html">oden_<wbr>plugin_<wbr>rs</a><span class="version">50.0.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module message_<wbr>bus</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#design" title="Design">Design</a></li><li><a href="#abi-stability-across-toolchains-and-allocators" title="ABI stability across toolchains and allocators">ABI stability across toolchains and allocators</a></li><li><a href="#receive-contract" title="Receive contract">Receive contract</a></li><li><a href="#late-subscribers" title="Late subscribers">Late subscribers</a></li><li><a href="#lifecycle-the-bus-outlives-owners-and-clients" title="Lifecycle: the bus outlives owners and clients">Lifecycle: the bus outlives owners and clients</a></li></ul><h3><a href="#modules">Module Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#enums" title="Enums">Enums</a></li></ul></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="../index.html">In crate oden_<wbr>plugin_<wbr>rs</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">oden_plugin_rs</a></div><h1>Module <span>message_<wbr>bus</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/oden_plugin_rs/message_bus/mod.rs.html#1-691">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Generic 1↔N message bus shared between plugins.</p>
+<h2 id="design"><a class="doc-anchor" href="#design">§</a>Design</h2>
+<p>One <em>owner</em> plugin creates a <code>BusOwner</code> under a well-known UUID. Any other
+plugin in the same process opens a <code>BusClient</code> against that UUID. Clients can
+<code>subscribe</code> to named messages broadcast by the owner (downstream) and <code>send</code>
+messages back to the owner (upstream).</p>
+<h2 id="abi-stability-across-toolchains-and-allocators"><a class="doc-anchor" href="#abi-stability-across-toolchains-and-allocators">§</a>ABI stability across toolchains and allocators</h2>
+<p>The shared state lives behind a vtable published alongside it. Every function
+pointer in that vtable runs in the host executable’s translation unit, so one <code>std</code>
+and global allocator own the bus’s internal <code>HashMap</code>, <code>Mutex</code>, <code>mpsc</code> channels, and
+queued message <code>Vec&lt;u8&gt;</code>s. Plugins only touch <code>#[repr(C)]</code> POD across the boundary:
+borrowed <code>BusStr</code>/<code>BusBytes</code> (input) and caller-allocated output buffers. No
+<code>Vec</code>/<code>String</code>/<code>Arc</code> ever flows between sides, so a client built with a different
+Rust toolchain or <code>#[global_allocator]</code> than the owner is fine — there is no
+cross-boundary <code>free</code>.</p>
+<h2 id="receive-contract"><a class="doc-anchor" href="#receive-contract">§</a>Receive contract</h2>
+<p>The ABI’s receive functions take caller-allocated output buffers. If the buffers are
+too small, the bus writes the required sizes and returns <code>BufferTooSmall</code> <em>without
+popping the message</em>; the same message is delivered on retry once buffers are big
+enough. The safe Rust facade in this module hides that retry loop, so users only
+see <code>Option&lt;OwnedMessage&gt;</code>.</p>
+<h2 id="late-subscribers"><a class="doc-anchor" href="#late-subscribers">§</a>Late subscribers</h2>
+<p>A broadcast that matches no live subscription is parked inside the bus (up to 128
+messages) and handed, in order, to the first later subscription whose name filter
+matches. Parked messages that don’t fit in the claiming subscription’s queue are
+dropped — impossible with the default queue capacity (128, matching the parked
+buffer), possible with a smaller explicit capacity. This mirrors the old
+named-channel behavior where messages sent before
+the consumer attached waited in the queue, and covers the window between a
+webview page connecting and a client plugin’s first subscribe (startup, project
+load, bus reconnect). A message that matched at least one subscription at
+broadcast time is never re-delivered to subscriptions created later.</p>
+<h2 id="lifecycle-the-bus-outlives-owners-and-clients"><a class="doc-anchor" href="#lifecycle-the-bus-outlives-owners-and-clients">§</a>Lifecycle: the bus outlives owners and clients</h2>
+<p>The bus under a UUID is a process-lifetime mailbox living in the host
+executable. The first endpoint to dial a UUID — owner or client — allocates it
+through the host’s factory record (see <a href="host/index.html" title="mod oden_plugin_rs::message_bus::host"><code>host</code></a>) and publishes its address in
+the discovery record; every later <a href="struct.BusOwner.html#method.open" title="associated function oden_plugin_rs::message_bus::BusOwner::open"><code>BusOwner::open</code></a> or <a href="struct.BusClient.html#method.open" title="associated function oden_plugin_rs::message_bus::BusClient::open"><code>BusClient::open</code></a>
+for the same UUID adopts that same bus. It is never torn down: subscriptions,
+queued messages, and pending receive futures all stay valid while the owner
+plugin is unloaded, hot-reloaded, or restarted. Clients subscribe once and
+simply see no messages while no owner is broadcasting; upstream sends wait in
+the bounded upstream queue for the next owner to drain them. There is no
+liveness state to poll.</p>
+<p>The <code>BusState</code> allocation is <strong>never freed</strong>. Its address is embedded in the
+discovery record published through <code>SettingsApi</code>, which exposes no way to retract a
+record, so freeing would leave a dangling pointer for a later <code>open</code> to
+dereference. It is leaked for the process lifetime — one allocation per UUID —
+mirroring <code>named_shared_data</code>’s leaked holder.</p>
+<p>Because the bus vtable and <code>BusState</code> live in the host executable, they survive
+any plugin DLL/SO unload. A host that publishes no factory record cannot run
+buses — <code>open</code> panics rather than allocating the bus inside the
+plugin’s own DLL, where an unload would unmap it under live users. That unload
+hazard still exists for <code>named_mpmc_channel</code> and <code>named_shared_data</code>, whose
+state lives in the owning plugin.</p>
+<p>One hazard remains for the bus: wake callbacks registered by
+<a href="struct.Subscription.html#method.recv_async" title="method oden_plugin_rs::message_bus::Subscription::recv_async"><code>Subscription::recv_async</code></a> / <a href="struct.BusOwner.html#method.recv_upstream_async" title="method oden_plugin_rs::message_bus::BusOwner::recv_upstream_async"><code>BusOwner::recv_upstream_async</code></a> point into the
+plugin that polled the future. Dropping the future unregisters them, so this only
+bites a plugin that leaks a pending <code>RecvFuture</code> past its own unload.</p>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="abi/index.html" title="mod oden_plugin_rs::message_bus::abi">abi</a></dt><dd>ABI for the cross-plugin message bus.</dd><dt><a class="mod" href="host/index.html" title="mod oden_plugin_rs::message_bus::host">host</a></dt><dd>Host side of the message bus.</dd></dl><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.BusClient.html" title="struct oden_plugin_rs::message_bus::BusClient">BusClient</a></dt><dd>Client-side handle for a bus owned by some other plugin.</dd><dt><a class="struct" href="struct.BusOwner.html" title="struct oden_plugin_rs::message_bus::BusOwner">BusOwner</a></dt><dd>Owner-side handle. Created by the plugin that wants to be addressable.</dd><dt><a class="struct" href="struct.OwnedMessage.html" title="struct oden_plugin_rs::message_bus::OwnedMessage">Owned<wbr>Message</a></dt><dd>A message delivered from / received by the bus, owned by the caller’s allocator.</dd><dt><a class="struct" href="struct.RecvFuture.html" title="struct oden_plugin_rs::message_bus::RecvFuture">Recv<wbr>Future</a></dt><dd>Future returned by <a href="struct.BusOwner.html#method.recv_upstream_async" title="method oden_plugin_rs::message_bus::BusOwner::recv_upstream_async"><code>BusOwner::recv_upstream_async</code></a> and <a href="struct.Subscription.html#method.recv_async" title="method oden_plugin_rs::message_bus::Subscription::recv_async"><code>Subscription::recv_async</code></a>.</dd><dt><a class="struct" href="struct.Subscription.html" title="struct oden_plugin_rs::message_bus::Subscription">Subscription</a></dt><dd>A live subscription. Drops the subscription on <code>Drop</code>.</dd></dl><h2 id="enums" class="section-header">Enums<a href="#enums" class="anchor">§</a></h2><dl class="item-table"><dt><a class="enum" href="enum.SendError.html" title="enum oden_plugin_rs::message_bus::SendError">Send<wbr>Error</a></dt><dd>Error returned by <a href="struct.BusOwner.html#method.broadcast" title="method oden_plugin_rs::message_bus::BusOwner::broadcast"><code>BusOwner::broadcast</code></a> and <a href="struct.BusClient.html#method.send" title="method oden_plugin_rs::message_bus::BusClient::send"><code>BusClient::send</code></a>.</dd></dl></section></div></main></body></html>

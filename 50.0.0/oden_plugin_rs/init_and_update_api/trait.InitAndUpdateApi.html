@@ -1,0 +1,123 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `InitAndUpdateApi` trait in crate `oden_plugin_rs`."><title>InitAndUpdateApi in oden_plugin_rs::init_and_update_api - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="oden_plugin_rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"><style>
+.oden-version-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.85rem;
+}
+.oden-version-picker label {
+    color: var(--sidebar-link-color, inherit);
+}
+.oden-version-picker select {
+    flex: 1;
+    min-width: 0;
+}
+</style>
+<script>
+(function () {
+    var CURRENT = "50.0.0";
+    function init() {
+        var path = location.pathname;
+        var marker = "/" + CURRENT + "/";
+        var idx = path.indexOf(marker);
+        if (idx === -1) {
+            return;
+        }
+        var root = path.slice(0, idx + 1);
+        var rest = path.slice(idx + marker.length);
+        fetch(root + "versions.json", { cache: "no-cache" })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (versions) {
+                if (!Array.isArray(versions) || versions.length === 0) {
+                    return;
+                }
+                var picker = document.createElement("div");
+                picker.className = "oden-version-picker";
+                var label = document.createElement("label");
+                label.setAttribute("for", "oden-version-select");
+                label.textContent = "Version";
+                var select = document.createElement("select");
+                select.id = "oden-version-select";
+                versions.forEach(function (version) {
+                    var option = document.createElement("option");
+                    option.value = version;
+                    option.textContent = version;
+                    if (version === CURRENT) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                select.addEventListener("change", function () {
+                    location.href = root + encodeURIComponent(select.value) + "/" + rest;
+                });
+                picker.appendChild(label);
+                picker.appendChild(select);
+                var host = document.querySelector(".sidebar-crate")
+                    || document.querySelector("nav.sidebar")
+                    || document.querySelector(".sidebar");
+                if (host) {
+                    host.appendChild(picker);
+                }
+            })
+            .catch(function () {});
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>
+
+</head><body class="rustdoc trait"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">InitAndUpdateApi</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../oden_plugin_rs/index.html">oden_<wbr>plugin_<wbr>rs</a><span class="version">50.0.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Init<wbr>AndUpdate<wbr>Api</a></h2><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.register_gl_tex_id" title="register_gl_tex_id">register_gl_tex_id</a></li><li><a href="#tymethod.register_image_callback" title="register_image_callback">register_image_callback</a></li><li><a href="#tymethod.register_iosurface_id" title="register_iosurface_id">register_iosurface_id</a></li><li><a href="#tymethod.set_window_title" title="set_window_title">set_window_title</a></li><li><a href="#tymethod.upload_font" title="upload_font">upload_font</a></li><li><a href="#tymethod.upload_image" title="upload_image">upload_image</a></li><li><a href="#tymethod.upload_image_ex" title="upload_image_ex">upload_image_ex</a></li><li><a href="#tymethod.upload_shader" title="upload_shader">upload_shader</a></li></ul><h3><a href="#dyn-compatibility">Dyn Compatibility</a></h3><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2><a href="index.html">In oden_<wbr>plugin_<wbr>rs::<wbr>init_<wbr>and_<wbr>update_<wbr>api</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">oden_plugin_rs</a>::<wbr><a href="index.html">init_and_update_api</a></div><h1>Trait <span class="trait">Init<wbr>AndUpdate<wbr>Api</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#14-32">Source</a> </span></div><pre class="rust item-decl"><code>pub trait InitAndUpdateApi {
+    // Required methods
+    fn <a href="#tymethod.upload_image" class="fn">upload_image</a>(
+        &amp;self,
+        id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        image_width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        image_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        image: &amp;[<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.u8.html">u8</a>],
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.upload_image_ex" class="fn">upload_image_ex</a>(
+        &amp;self,
+        id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        image_width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        image_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        image: &amp;[<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.u8.html">u8</a>],
+        params: &amp;<a class="type" href="../type.UploadImageParams.html" title="type oden_plugin_rs::UploadImageParams">UploadImageParams</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.upload_font" class="fn">upload_font</a>&lt;'a&gt;(
+        &amp;self,
+        id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        glyph_size: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        font_descriptors: &amp;[<a class="struct" href="struct.FontDescriptor.html" title="struct oden_plugin_rs::init_and_update_api::FontDescriptor">FontDescriptor</a>&lt;'a&gt;],
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.upload_shader" class="fn">upload_shader</a>(&amp;self, id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>, code: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.bool.html">bool</a>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.register_gl_tex_id" class="fn">register_gl_tex_id</a>(&amp;self, id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>, tex_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.u32.html">u32</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.register_iosurface_id" class="fn">register_iosurface_id</a>(&amp;self, id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>, iosurface_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.u32.html">u32</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.register_image_callback" class="fn">register_image_callback</a>&lt;F&gt;(&amp;self, stream_id: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>, callback: F)
+       <span class="where">where F: <a class="trait" href="https://doc.rust-lang.org/1.96.0/core/ops/function/trait.FnMut.html" title="trait core::ops::function::FnMut">FnMut</a>(<a class="type" href="../type.VideoFrame.html" title="type oden_plugin_rs::VideoFrame">VideoFrame</a>) + <a class="trait" href="https://doc.rust-lang.org/1.96.0/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'static</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.set_window_title" class="fn">set_window_title</a>(&amp;self, title: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>);
+}</code></pre><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><section id="tymethod.upload_image" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#15">Source</a><h4 class="code-header">fn <a href="#tymethod.upload_image" class="fn">upload_image</a>(
+    &amp;self,
+    id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    image_width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    image_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    image: &amp;[<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.u8.html">u8</a>],
+)</h4></section><section id="tymethod.upload_image_ex" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#16-23">Source</a><h4 class="code-header">fn <a href="#tymethod.upload_image_ex" class="fn">upload_image_ex</a>(
+    &amp;self,
+    id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    image_width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    image_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    image: &amp;[<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.u8.html">u8</a>],
+    params: &amp;<a class="type" href="../type.UploadImageParams.html" title="type oden_plugin_rs::UploadImageParams">UploadImageParams</a>,
+)</h4></section><section id="tymethod.upload_font" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#24">Source</a><h4 class="code-header">fn <a href="#tymethod.upload_font" class="fn">upload_font</a>&lt;'a&gt;(
+    &amp;self,
+    id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    glyph_size: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    font_descriptors: &amp;[<a class="struct" href="struct.FontDescriptor.html" title="struct oden_plugin_rs::init_and_update_api::FontDescriptor">FontDescriptor</a>&lt;'a&gt;],
+)</h4></section><section id="tymethod.upload_shader" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#25">Source</a><h4 class="code-header">fn <a href="#tymethod.upload_shader" class="fn">upload_shader</a>(&amp;self, id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>, code: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.bool.html">bool</a></h4></section><section id="tymethod.register_gl_tex_id" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#26">Source</a><h4 class="code-header">fn <a href="#tymethod.register_gl_tex_id" class="fn">register_gl_tex_id</a>(&amp;self, id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>, tex_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.u32.html">u32</a>)</h4></section><section id="tymethod.register_iosurface_id" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#27">Source</a><h4 class="code-header">fn <a href="#tymethod.register_iosurface_id" class="fn">register_iosurface_id</a>(&amp;self, id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>, iosurface_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.u32.html">u32</a>)</h4></section><section id="tymethod.register_image_callback" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#28-30">Source</a><h4 class="code-header">fn <a href="#tymethod.register_image_callback" class="fn">register_image_callback</a>&lt;F&gt;(&amp;self, stream_id: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>, callback: F)<div class="where">where
+    F: <a class="trait" href="https://doc.rust-lang.org/1.96.0/core/ops/function/trait.FnMut.html" title="trait core::ops::function::FnMut">FnMut</a>(<a class="type" href="../type.VideoFrame.html" title="type oden_plugin_rs::VideoFrame">VideoFrame</a>) + <a class="trait" href="https://doc.rust-lang.org/1.96.0/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'static,</div></h4></section><section id="tymethod.set_window_title" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#31">Source</a><h4 class="code-header">fn <a href="#tymethod.set_window_title" class="fn">set_window_title</a>(&amp;self, title: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>)</h4></section></div><h2 id="dyn-compatibility" class="section-header">Dyn Compatibility<a href="#dyn-compatibility" class="anchor">§</a></h2><div class="dyn-compatibility-info"><p>This trait is <b>not</b> <a href="https://doc.rust-lang.org/1.96.0/reference/items/traits.html#dyn-compatibility">dyn compatible</a>.</p><p><i>In older versions of Rust, dyn compatibility was called "object safety", so this trait is not object safe.</i></p></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><div class="negative-marker"></div><section id="impl-InitAndUpdateApi-for-InitParams%3C'_%3E" class="impl"><a class="src rightside" href="../../src/oden_plugin_rs/init_params.rs.html#30">Source</a><a href="#impl-InitAndUpdateApi-for-InitParams%3C'_%3E" class="anchor">§</a><h3 class="code-header">impl <a class="trait" href="trait.InitAndUpdateApi.html" title="trait oden_plugin_rs::init_and_update_api::InitAndUpdateApi">InitAndUpdateApi</a> for <a class="struct" href="../struct.InitParams.html" title="struct oden_plugin_rs::InitParams">InitParams</a>&lt;'_&gt;</h3></section><section id="impl-InitAndUpdateApi-for-UpdateParams%3C'_%3E" class="impl"><a class="src rightside" href="../../src/oden_plugin_rs/update_params.rs.html#47">Source</a><a href="#impl-InitAndUpdateApi-for-UpdateParams%3C'_%3E" class="anchor">§</a><h3 class="code-header">impl <a class="trait" href="trait.InitAndUpdateApi.html" title="trait oden_plugin_rs::init_and_update_api::InitAndUpdateApi">InitAndUpdateApi</a> for <a class="struct" href="../struct.UpdateParams.html" title="struct oden_plugin_rs::UpdateParams">UpdateParams</a>&lt;'_&gt;</h3></section><section id="impl-InitAndUpdateApi-for-MockInitAndUpdateApi" class="impl"><a class="src rightside" href="../../src/oden_plugin_rs/init_and_update_api.rs.html#13">Source</a><a href="#impl-InitAndUpdateApi-for-MockInitAndUpdateApi" class="anchor">§</a><h3 class="code-header">impl <a class="trait" href="trait.InitAndUpdateApi.html" title="trait oden_plugin_rs::init_and_update_api::InitAndUpdateApi">InitAndUpdateApi</a> for <a class="struct" href="struct.MockInitAndUpdateApi.html" title="struct oden_plugin_rs::init_and_update_api::MockInitAndUpdateApi">MockInitAndUpdateApi</a></h3></section></div><script src="../../trait.impl/oden_plugin_rs/init_and_update_api/trait.InitAndUpdateApi.js" async></script></section></div></main></body></html>

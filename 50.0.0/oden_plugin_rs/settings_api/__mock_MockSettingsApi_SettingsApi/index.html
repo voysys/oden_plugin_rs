@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `__mock_MockSettingsApi_SettingsApi` mod in crate `oden_plugin_rs`."><title>oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="oden_plugin_rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"><style>
+.oden-version-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.85rem;
+}
+.oden-version-picker label {
+    color: var(--sidebar-link-color, inherit);
+}
+.oden-version-picker select {
+    flex: 1;
+    min-width: 0;
+}
+</style>
+<script>
+(function () {
+    var CURRENT = "50.0.0";
+    function init() {
+        var path = location.pathname;
+        var marker = "/" + CURRENT + "/";
+        var idx = path.indexOf(marker);
+        if (idx === -1) {
+            return;
+        }
+        var root = path.slice(0, idx + 1);
+        var rest = path.slice(idx + marker.length);
+        fetch(root + "versions.json", { cache: "no-cache" })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (versions) {
+                if (!Array.isArray(versions) || versions.length === 0) {
+                    return;
+                }
+                var picker = document.createElement("div");
+                picker.className = "oden-version-picker";
+                var label = document.createElement("label");
+                label.setAttribute("for", "oden-version-select");
+                label.textContent = "Version";
+                var select = document.createElement("select");
+                select.id = "oden-version-select";
+                versions.forEach(function (version) {
+                    var option = document.createElement("option");
+                    option.value = version;
+                    option.textContent = version;
+                    if (version === CURRENT) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                select.addEventListener("change", function () {
+                    location.href = root + encodeURIComponent(select.value) + "/" + rest;
+                });
+                picker.appendChild(label);
+                picker.appendChild(select);
+                var host = document.querySelector(".sidebar-crate")
+                    || document.querySelector("nav.sidebar")
+                    || document.querySelector(".sidebar");
+                if (host) {
+                    host.appendChild(picker);
+                }
+            })
+            .catch(function () {});
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>
+
+</head><body class="rustdoc mod"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module __mock_MockSettingsApi_SettingsApi</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../oden_plugin_rs/index.html">oden_<wbr>plugin_<wbr>rs</a><span class="version">50.0.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module __<wbr>mock_<wbr>Mock<wbr>Settings<wbr>Api_<wbr>Settings<wbr>Api</a></h2><h3><a href="#modules">Module Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In oden_<wbr>plugin_<wbr>rs::<wbr>settings_<wbr>api</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">oden_plugin_rs</a>::<wbr><a href="../index.html">settings_api</a></div><h1>Module <span>__<wbr>mock_<wbr>Mock<wbr>Settings<wbr>Api_<wbr>Settings<wbr>Api</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/oden_plugin_rs/settings_api.rs.html#7">Source</a> </span></div><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="__application_type/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__application_type">__<wbr>application_<wbr>type</a></dt><dt><a class="mod" href="__exit_application/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__exit_application">__<wbr>exit_<wbr>application</a></dt><dt><a class="mod" href="__instance_uuid/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__instance_uuid">__<wbr>instance_<wbr>uuid</a></dt><dt><a class="mod" href="__license_hash/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__license_hash">__<wbr>license_<wbr>hash</a></dt><dt><a class="mod" href="__oden_version/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__oden_version">__<wbr>oden_<wbr>version</a></dt><dt><a class="mod" href="__plugin_param/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__plugin_param">__<wbr>plugin_<wbr>param</a></dt><dt><a class="mod" href="__project_file_path/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__project_file_path">__<wbr>project_<wbr>file_<wbr>path</a></dt><dt><a class="mod" href="__project_path/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__project_path">__<wbr>project_<wbr>path</a></dt><dt><a class="mod" href="__project_plugin_path/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__project_plugin_path">__<wbr>project_<wbr>plugin_<wbr>path</a></dt><dt><a class="mod" href="__publish_data/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__publish_data">__<wbr>publish_<wbr>data</a></dt><dt><a class="mod" href="__query_data/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__query_data">__<wbr>query_<wbr>data</a></dt><dt><a class="mod" href="__read_bool/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__read_bool">__<wbr>read_<wbr>bool</a></dt><dt><a class="mod" href="__read_float/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__read_float">__<wbr>read_<wbr>float</a></dt><dt><a class="mod" href="__read_int/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__read_int">__<wbr>read_<wbr>int</a></dt><dt><a class="mod" href="__read_scene_string/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__read_scene_string">__<wbr>read_<wbr>scene_<wbr>string</a></dt><dt><a class="mod" href="__read_string/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__read_string">__<wbr>read_<wbr>string</a></dt><dt><a class="mod" href="__set_has_crashed/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__set_has_crashed">__<wbr>set_<wbr>has_<wbr>crashed</a></dt><dt><a class="mod" href="__set_ui_disable/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__set_ui_disable">__<wbr>set_<wbr>ui_<wbr>disable</a></dt><dt><a class="mod" href="__write_bool/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__write_bool">__<wbr>write_<wbr>bool</a></dt><dt><a class="mod" href="__write_float/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__write_float">__<wbr>write_<wbr>float</a></dt><dt><a class="mod" href="__write_int/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__write_int">__<wbr>write_<wbr>int</a></dt><dt><a class="mod" href="__write_scene_string/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__write_scene_string">__<wbr>write_<wbr>scene_<wbr>string</a></dt><dt><a class="mod" href="__write_string/index.html" title="mod oden_plugin_rs::settings_api::__mock_MockSettingsApi_SettingsApi::__write_string">__<wbr>write_<wbr>string</a></dt></dl></section></div></main></body></html>

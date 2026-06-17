@@ -1,0 +1,421 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `ImDrawApi` trait in crate `oden_plugin_rs`."><title>ImDrawApi in oden_plugin_rs::im_draw_api - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="oden_plugin_rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"><style>
+.oden-version-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.85rem;
+}
+.oden-version-picker label {
+    color: var(--sidebar-link-color, inherit);
+}
+.oden-version-picker select {
+    flex: 1;
+    min-width: 0;
+}
+</style>
+<script>
+(function () {
+    var CURRENT = "50.0.0";
+    function init() {
+        var path = location.pathname;
+        var marker = "/" + CURRENT + "/";
+        var idx = path.indexOf(marker);
+        if (idx === -1) {
+            return;
+        }
+        var root = path.slice(0, idx + 1);
+        var rest = path.slice(idx + marker.length);
+        fetch(root + "versions.json", { cache: "no-cache" })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (versions) {
+                if (!Array.isArray(versions) || versions.length === 0) {
+                    return;
+                }
+                var picker = document.createElement("div");
+                picker.className = "oden-version-picker";
+                var label = document.createElement("label");
+                label.setAttribute("for", "oden-version-select");
+                label.textContent = "Version";
+                var select = document.createElement("select");
+                select.id = "oden-version-select";
+                versions.forEach(function (version) {
+                    var option = document.createElement("option");
+                    option.value = version;
+                    option.textContent = version;
+                    if (version === CURRENT) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                select.addEventListener("change", function () {
+                    location.href = root + encodeURIComponent(select.value) + "/" + rest;
+                });
+                picker.appendChild(label);
+                picker.appendChild(select);
+                var host = document.querySelector(".sidebar-crate")
+                    || document.querySelector("nav.sidebar")
+                    || document.querySelector(".sidebar");
+                if (host) {
+                    host.appendChild(picker);
+                }
+            })
+            .catch(function () {});
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>
+
+</head><body class="rustdoc trait"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">ImDrawApi</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../oden_plugin_rs/index.html">oden_<wbr>plugin_<wbr>rs</a><span class="version">50.0.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">ImDraw<wbr>Api</a></h2><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.im_draw_add_circle" title="im_draw_add_circle">im_draw_add_circle</a></li><li><a href="#tymethod.im_draw_add_circle_segment" title="im_draw_add_circle_segment">im_draw_add_circle_segment</a></li><li><a href="#tymethod.im_draw_add_cuboid" title="im_draw_add_cuboid">im_draw_add_cuboid</a></li><li><a href="#tymethod.im_draw_add_image" title="im_draw_add_image">im_draw_add_image</a></li><li><a href="#tymethod.im_draw_add_line" title="im_draw_add_line">im_draw_add_line</a></li><li><a href="#tymethod.im_draw_add_lines" title="im_draw_add_lines">im_draw_add_lines</a></li><li><a href="#tymethod.im_draw_add_rectangle" title="im_draw_add_rectangle">im_draw_add_rectangle</a></li><li><a href="#tymethod.im_draw_add_rectangle_aligned" title="im_draw_add_rectangle_aligned">im_draw_add_rectangle_aligned</a></li><li><a href="#tymethod.im_draw_add_rectangle_border" title="im_draw_add_rectangle_border">im_draw_add_rectangle_border</a></li><li><a href="#tymethod.im_draw_add_rectangle_border_aligned" title="im_draw_add_rectangle_border_aligned">im_draw_add_rectangle_border_aligned</a></li><li><a href="#tymethod.im_draw_add_rectangle_border_rounded" title="im_draw_add_rectangle_border_rounded">im_draw_add_rectangle_border_rounded</a></li><li><a href="#tymethod.im_draw_add_rectangle_border_rounded_aligned" title="im_draw_add_rectangle_border_rounded_aligned">im_draw_add_rectangle_border_rounded_aligned</a></li><li><a href="#tymethod.im_draw_add_rectangle_rounded" title="im_draw_add_rectangle_rounded">im_draw_add_rectangle_rounded</a></li><li><a href="#tymethod.im_draw_add_rectangle_rounded_aligned" title="im_draw_add_rectangle_rounded_aligned">im_draw_add_rectangle_rounded_aligned</a></li><li><a href="#tymethod.im_draw_add_square" title="im_draw_add_square">im_draw_add_square</a></li><li><a href="#tymethod.im_draw_add_text" title="im_draw_add_text">im_draw_add_text</a></li><li><a href="#tymethod.im_draw_add_text_aligned" title="im_draw_add_text_aligned">im_draw_add_text_aligned</a></li><li><a href="#tymethod.im_draw_add_text_aligned_normal" title="im_draw_add_text_aligned_normal">im_draw_add_text_aligned_normal</a></li><li><a href="#tymethod.im_draw_add_text_normal" title="im_draw_add_text_normal">im_draw_add_text_normal</a></li><li><a href="#tymethod.im_draw_add_torus" title="im_draw_add_torus">im_draw_add_torus</a></li><li><a href="#tymethod.im_draw_add_triangles" title="im_draw_add_triangles">im_draw_add_triangles</a></li><li><a href="#tymethod.im_draw_add_triangles_with_uvs" title="im_draw_add_triangles_with_uvs">im_draw_add_triangles_with_uvs</a></li><li><a href="#tymethod.im_draw_add_video" title="im_draw_add_video">im_draw_add_video</a></li><li><a href="#tymethod.im_draw_add_video_with_uvs" title="im_draw_add_video_with_uvs">im_draw_add_video_with_uvs</a></li><li><a href="#tymethod.im_draw_calc_text_size" title="im_draw_calc_text_size">im_draw_calc_text_size</a></li><li><a href="#tymethod.im_draw_latch_backbuffer" title="im_draw_latch_backbuffer">im_draw_latch_backbuffer</a></li><li><a href="#tymethod.im_draw_pop_matrix" title="im_draw_pop_matrix">im_draw_pop_matrix</a></li><li><a href="#tymethod.im_draw_pop_shader" title="im_draw_pop_shader">im_draw_pop_shader</a></li><li><a href="#tymethod.im_draw_pop_view_space" title="im_draw_pop_view_space">im_draw_pop_view_space</a></li><li><a href="#tymethod.im_draw_push_matrix" title="im_draw_push_matrix">im_draw_push_matrix</a></li><li><a href="#tymethod.im_draw_push_shader" title="im_draw_push_shader">im_draw_push_shader</a></li><li><a href="#tymethod.im_draw_push_view_space" title="im_draw_push_view_space">im_draw_push_view_space</a></li><li><a href="#tymethod.im_draw_set_tint" title="im_draw_set_tint">im_draw_set_tint</a></li><li><a href="#tymethod.im_draw_set_use_z_buffer" title="im_draw_set_use_z_buffer">im_draw_set_use_z_buffer</a></li><li><a href="#tymethod.im_draw_set_view_space_z" title="im_draw_set_view_space_z">im_draw_set_view_space_z</a></li><li><a href="#tymethod.im_draw_set_write_z_buffer" title="im_draw_set_write_z_buffer">im_draw_set_write_z_buffer</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2><a href="index.html">In oden_<wbr>plugin_<wbr>rs::<wbr>im_<wbr>draw_<wbr>api</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">oden_plugin_rs</a>::<wbr><a href="index.html">im_draw_api</a></div><h1>Trait <span class="trait">ImDraw<wbr>Api</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/oden_plugin_rs/im_draw_api.rs.html#11-176">Source</a> </span></div><pre class="rust item-decl"><code>pub trait ImDrawApi {
+<details class="toggle type-contents-toggle"><summary class="hideme"><span>Show 36 methods</span></summary>    // Required methods
+    fn <a href="#tymethod.im_draw_set_use_z_buffer" class="fn">im_draw_set_use_z_buffer</a>(&amp;self, enable: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.bool.html">bool</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_set_write_z_buffer" class="fn">im_draw_set_write_z_buffer</a>(&amp;self, enable: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.bool.html">bool</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_push_matrix" class="fn">im_draw_push_matrix</a>(&amp;self, mat: <a class="struct" href="../math/struct.Matrix4.html" title="struct oden_plugin_rs::math::Matrix4">Matrix4</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_pop_matrix" class="fn">im_draw_pop_matrix</a>(&amp;self);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_push_view_space" class="fn">im_draw_push_view_space</a>(&amp;self);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_pop_view_space" class="fn">im_draw_pop_view_space</a>(&amp;self);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_set_view_space_z" class="fn">im_draw_set_view_space_z</a>(&amp;self, z: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_set_tint" class="fn">im_draw_set_tint</a>(&amp;self, tint: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_push_shader" class="fn">im_draw_push_shader</a>(&amp;self, shader_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_pop_shader" class="fn">im_draw_pop_shader</a>(&amp;self);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_latch_backbuffer" class="fn">im_draw_latch_backbuffer</a>(&amp;self, blur_passes: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_line" class="fn">im_draw_add_line</a>(
+        &amp;self,
+        from: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        to: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_circle_segment" class="fn">im_draw_add_circle_segment</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        from_angle_rad: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        to_angle_rad: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+        circle_segments: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_circle" class="fn">im_draw_add_circle</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+        circle_segments: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_square" class="fn">im_draw_add_square</a>(&amp;self, pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>, width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>, color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_rectangle" class="fn">im_draw_add_rectangle</a>(&amp;self, pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>, color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_rectangle_rounded" class="fn">im_draw_add_rectangle_rounded</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        rounding: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_image" class="fn">im_draw_add_image</a>(&amp;self, pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>, image_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_video" class="fn">im_draw_add_video</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        entity: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+        stream_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_video_with_uvs" class="fn">im_draw_add_video_with_uvs</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        entity: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+        stream_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        op_left_uv: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        bottom_right_uv: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_text" class="fn">im_draw_add_text</a>(
+        &amp;self,
+        text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+        font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_text_normal" class="fn">im_draw_add_text_normal</a>(
+        &amp;self,
+        text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+        font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_text_aligned" class="fn">im_draw_add_text_aligned</a>(
+        &amp;self,
+        text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        bounding_box: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        text_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        alignment: <a class="type" href="../type.ImDrawTextAlignment.html" title="type oden_plugin_rs::ImDrawTextAlignment">ImDrawTextAlignment</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+        font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_text_aligned_normal" class="fn">im_draw_add_text_aligned_normal</a>(
+        &amp;self,
+        text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        bounding_box: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        text_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        alignment: <a class="type" href="../type.ImDrawTextAlignment.html" title="type oden_plugin_rs::ImDrawTextAlignment">ImDrawTextAlignment</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+        font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_torus" class="fn">im_draw_add_torus</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        circle_radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        tube_radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_lines" class="fn">im_draw_add_lines</a>(
+        &amp;self,
+        point: &amp;[<a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>],
+        normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_rectangle_border" class="fn">im_draw_add_rectangle_border</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        thickness: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_rectangle_border_rounded" class="fn">im_draw_add_rectangle_border_rounded</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        thickness: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        inner_corner_radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        inner_corner_segments: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_cuboid" class="fn">im_draw_add_cuboid</a>(&amp;self, pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, size: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>);
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_triangles" class="fn">im_draw_add_triangles</a>(
+        &amp;self,
+        vertex_positions: &amp;mut [<a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>],
+        vertex_colors: &amp;mut [<a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>],
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_rectangle_aligned" class="fn">im_draw_add_rectangle_aligned</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_rectangle_rounded_aligned" class="fn">im_draw_add_rectangle_rounded_aligned</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        rounding: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_rectangle_border_aligned" class="fn">im_draw_add_rectangle_border_aligned</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        thickness: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_rectangle_border_rounded_aligned" class="fn">im_draw_add_rectangle_border_rounded_aligned</a>(
+        &amp;self,
+        pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+        size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+        thickness: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        inner_corner_radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        inner_corner_segments: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+        color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_add_triangles_with_uvs" class="fn">im_draw_add_triangles_with_uvs</a>(
+        &amp;self,
+        vertex_positions: &amp;[<a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>],
+        vertex_uvs: &amp;[<a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>],
+        vertex_colors: &amp;[<a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>],
+    );
+<span class="item-spacer"></span>    fn <a href="#tymethod.im_draw_calc_text_size" class="fn">im_draw_calc_text_size</a>(
+        &amp;self,
+        text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+        text_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        max_width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+        font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    ) -&gt; <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>;
+</details>}</code></pre><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><section id="tymethod.im_draw_set_use_z_buffer" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#12">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_set_use_z_buffer" class="fn">im_draw_set_use_z_buffer</a>(&amp;self, enable: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.bool.html">bool</a>)</h4></section><section id="tymethod.im_draw_set_write_z_buffer" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#13">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_set_write_z_buffer" class="fn">im_draw_set_write_z_buffer</a>(&amp;self, enable: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.bool.html">bool</a>)</h4></section><section id="tymethod.im_draw_push_matrix" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#14">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_push_matrix" class="fn">im_draw_push_matrix</a>(&amp;self, mat: <a class="struct" href="../math/struct.Matrix4.html" title="struct oden_plugin_rs::math::Matrix4">Matrix4</a>)</h4></section><section id="tymethod.im_draw_pop_matrix" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#15">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_pop_matrix" class="fn">im_draw_pop_matrix</a>(&amp;self)</h4></section><section id="tymethod.im_draw_push_view_space" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#16">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_push_view_space" class="fn">im_draw_push_view_space</a>(&amp;self)</h4></section><section id="tymethod.im_draw_pop_view_space" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#17">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_pop_view_space" class="fn">im_draw_pop_view_space</a>(&amp;self)</h4></section><section id="tymethod.im_draw_set_view_space_z" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#18">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_set_view_space_z" class="fn">im_draw_set_view_space_z</a>(&amp;self, z: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>)</h4></section><section id="tymethod.im_draw_set_tint" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#19">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_set_tint" class="fn">im_draw_set_tint</a>(&amp;self, tint: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>)</h4></section><section id="tymethod.im_draw_push_shader" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#20">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_push_shader" class="fn">im_draw_push_shader</a>(&amp;self, shader_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>)</h4></section><section id="tymethod.im_draw_pop_shader" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#21">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_pop_shader" class="fn">im_draw_pop_shader</a>(&amp;self)</h4></section><section id="tymethod.im_draw_latch_backbuffer" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#22">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_latch_backbuffer" class="fn">im_draw_latch_backbuffer</a>(&amp;self, blur_passes: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>)</h4></section><section id="tymethod.im_draw_add_line" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#23">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_line" class="fn">im_draw_add_line</a>(
+    &amp;self,
+    from: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    to: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_circle_segment" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#25-35">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_circle_segment" class="fn">im_draw_add_circle_segment</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    from_angle_rad: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    to_angle_rad: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    circle_segments: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+)</h4></section><section id="tymethod.im_draw_add_circle" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#36-44">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_circle" class="fn">im_draw_add_circle</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    circle_segments: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+)</h4></section><section id="tymethod.im_draw_add_square" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#45">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_square" class="fn">im_draw_add_square</a>(&amp;self, pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>, width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>, color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>)</h4></section><section id="tymethod.im_draw_add_rectangle" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#46">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_rectangle" class="fn">im_draw_add_rectangle</a>(&amp;self, pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>, color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>)</h4></section><section id="tymethod.im_draw_add_rectangle_rounded" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#47">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_rectangle_rounded" class="fn">im_draw_add_rectangle_rounded</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    rounding: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_image" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#48">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_image" class="fn">im_draw_add_image</a>(&amp;self, pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>, image_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>)</h4></section><section id="tymethod.im_draw_add_video" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#49">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_video" class="fn">im_draw_add_video</a>(&amp;self, pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>, entity: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>, stream_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>)</h4></section><section id="tymethod.im_draw_add_video_with_uvs" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#50-58">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_video_with_uvs" class="fn">im_draw_add_video_with_uvs</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    entity: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+    stream_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    op_left_uv: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    bottom_right_uv: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+)</h4></section><section id="tymethod.im_draw_add_text" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#60-68">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_text" class="fn">im_draw_add_text</a>(
+    &amp;self,
+    text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+)</h4></section><section id="tymethod.im_draw_add_text_normal" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#70-78">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_text_normal" class="fn">im_draw_add_text_normal</a>(
+    &amp;self,
+    text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    size: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+)</h4></section><section id="tymethod.im_draw_add_text_aligned" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#80-91">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_text_aligned" class="fn">im_draw_add_text_aligned</a>(
+    &amp;self,
+    text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    bounding_box: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    text_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    alignment: <a class="type" href="../type.ImDrawTextAlignment.html" title="type oden_plugin_rs::ImDrawTextAlignment">ImDrawTextAlignment</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+)</h4></section><section id="tymethod.im_draw_add_text_aligned_normal" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#93-103">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_text_aligned_normal" class="fn">im_draw_add_text_aligned_normal</a>(
+    &amp;self,
+    text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    bounding_box: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    text_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    alignment: <a class="type" href="../type.ImDrawTextAlignment.html" title="type oden_plugin_rs::ImDrawTextAlignment">ImDrawTextAlignment</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+    font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+)</h4></section><section id="tymethod.im_draw_add_torus" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#104-111">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_torus" class="fn">im_draw_add_torus</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    circle_radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    tube_radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_lines" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#112">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_lines" class="fn">im_draw_add_lines</a>(
+    &amp;self,
+    point: &amp;[<a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>],
+    normal: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_rectangle_border" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#113">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_rectangle_border" class="fn">im_draw_add_rectangle_border</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    thickness: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_rectangle_border_rounded" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#114-122">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_rectangle_border_rounded" class="fn">im_draw_add_rectangle_border_rounded</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    thickness: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    inner_corner_radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    inner_corner_segments: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_cuboid" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#123">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_cuboid" class="fn">im_draw_add_cuboid</a>(&amp;self, pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, size: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>, color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>)</h4></section><section id="tymethod.im_draw_add_triangles" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#124">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_triangles" class="fn">im_draw_add_triangles</a>(
+    &amp;self,
+    vertex_positions: &amp;mut [<a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>],
+    vertex_colors: &amp;mut [<a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>],
+)</h4></section><section id="tymethod.im_draw_add_rectangle_aligned" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#125-132">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_rectangle_aligned" class="fn">im_draw_add_rectangle_aligned</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_rectangle_rounded_aligned" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#133-141">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_rectangle_rounded_aligned" class="fn">im_draw_add_rectangle_rounded_aligned</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    rounding: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_rectangle_border_aligned" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#142-150">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_rectangle_border_aligned" class="fn">im_draw_add_rectangle_border_aligned</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    thickness: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_rectangle_border_rounded_aligned" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#152-162">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_rectangle_border_rounded_aligned" class="fn">im_draw_add_rectangle_border_rounded_aligned</a>(
+    &amp;self,
+    pos: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    up: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    right: <a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>,
+    size: <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>,
+    thickness: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    inner_corner_radius: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    inner_corner_segments: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+    color: <a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>,
+)</h4></section><section id="tymethod.im_draw_add_triangles_with_uvs" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#163-168">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_add_triangles_with_uvs" class="fn">im_draw_add_triangles_with_uvs</a>(
+    &amp;self,
+    vertex_positions: &amp;[<a class="struct" href="../math/struct.Vec3.html" title="struct oden_plugin_rs::math::Vec3">Vec3</a>],
+    vertex_uvs: &amp;[<a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a>],
+    vertex_colors: &amp;[<a class="struct" href="../math/struct.Vec4.html" title="struct oden_plugin_rs::math::Vec4">Vec4</a>],
+)</h4></section><section id="tymethod.im_draw_calc_text_size" class="method"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#169-175">Source</a><h4 class="code-header">fn <a href="#tymethod.im_draw_calc_text_size" class="fn">im_draw_calc_text_size</a>(
+    &amp;self,
+    text: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.str.html">str</a>,
+    text_height: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    max_width: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.f32.html">f32</a>,
+    font_id: <a class="primitive" href="https://doc.rust-lang.org/1.96.0/std/primitive.i32.html">i32</a>,
+) -&gt; <a class="struct" href="../math/struct.Vec2.html" title="struct oden_plugin_rs::math::Vec2">Vec2</a></h4></section></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><div class="negative-marker"></div><section id="impl-ImDrawApi-for-UpdateParams%3C'_%3E" class="impl"><a class="src rightside" href="../../src/oden_plugin_rs/update_params.rs.html#855-1497">Source</a><a href="#impl-ImDrawApi-for-UpdateParams%3C'_%3E" class="anchor">§</a><h3 class="code-header">impl <a class="trait" href="trait.ImDrawApi.html" title="trait oden_plugin_rs::im_draw_api::ImDrawApi">ImDrawApi</a> for <a class="struct" href="../struct.UpdateParams.html" title="struct oden_plugin_rs::UpdateParams">UpdateParams</a>&lt;'_&gt;</h3></section><section id="impl-ImDrawApi-for-MockImDrawApi" class="impl"><a class="src rightside" href="../../src/oden_plugin_rs/im_draw_api.rs.html#10">Source</a><a href="#impl-ImDrawApi-for-MockImDrawApi" class="anchor">§</a><h3 class="code-header">impl <a class="trait" href="trait.ImDrawApi.html" title="trait oden_plugin_rs::im_draw_api::ImDrawApi">ImDrawApi</a> for <a class="struct" href="struct.MockImDrawApi.html" title="struct oden_plugin_rs::im_draw_api::MockImDrawApi">MockImDrawApi</a></h3></section></div><script src="../../trait.impl/oden_plugin_rs/im_draw_api/trait.ImDrawApi.js" async></script></section></div></main></body></html>

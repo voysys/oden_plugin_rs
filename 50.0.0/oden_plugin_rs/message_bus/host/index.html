@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Host side of the message bus."><title>oden_plugin_rs::message_bus::host - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="oden_plugin_rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"><style>
+.oden-version-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.85rem;
+}
+.oden-version-picker label {
+    color: var(--sidebar-link-color, inherit);
+}
+.oden-version-picker select {
+    flex: 1;
+    min-width: 0;
+}
+</style>
+<script>
+(function () {
+    var CURRENT = "50.0.0";
+    function init() {
+        var path = location.pathname;
+        var marker = "/" + CURRENT + "/";
+        var idx = path.indexOf(marker);
+        if (idx === -1) {
+            return;
+        }
+        var root = path.slice(0, idx + 1);
+        var rest = path.slice(idx + marker.length);
+        fetch(root + "versions.json", { cache: "no-cache" })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (versions) {
+                if (!Array.isArray(versions) || versions.length === 0) {
+                    return;
+                }
+                var picker = document.createElement("div");
+                picker.className = "oden-version-picker";
+                var label = document.createElement("label");
+                label.setAttribute("for", "oden-version-select");
+                label.textContent = "Version";
+                var select = document.createElement("select");
+                select.id = "oden-version-select";
+                versions.forEach(function (version) {
+                    var option = document.createElement("option");
+                    option.value = version;
+                    option.textContent = version;
+                    if (version === CURRENT) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                select.addEventListener("change", function () {
+                    location.href = root + encodeURIComponent(select.value) + "/" + rest;
+                });
+                picker.appendChild(label);
+                picker.appendChild(select);
+                var host = document.querySelector(".sidebar-crate")
+                    || document.querySelector("nav.sidebar")
+                    || document.querySelector(".sidebar");
+                if (host) {
+                    host.appendChild(picker);
+                }
+            })
+            .catch(function () {});
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>
+
+</head><body class="rustdoc mod"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module host</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../oden_plugin_rs/index.html">oden_<wbr>plugin_<wbr>rs</a><span class="version">50.0.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module host</a></h2><h3><a href="#constants">Module Items</a></h3><ul class="block"><li><a href="#constants" title="Constants">Constants</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In oden_<wbr>plugin_<wbr>rs::<wbr>message_<wbr>bus</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">oden_plugin_rs</a>::<wbr><a href="../index.html">message_bus</a></div><h1>Module <span>host</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/oden_plugin_rs/message_bus/host.rs.html#1-95">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Host side of the message bus.</p>
+<p>The host publishes a <em>factory record</em> — the address of a <a href="../abi/struct.BusHostVTable.html" title="struct oden_plugin_rs::message_bus::abi::BusHostVTable"><code>BusHostVTable</code></a>
+living in the host executable — under <a href="constant.HOST_FACTORY_KEY.html" title="constant oden_plugin_rs::message_bus::host::HOST_FACTORY_KEY"><code>HOST_FACTORY_KEY</code></a> in the plugin
+data-sharing store, before any plugin runs.
+<a href="../struct.BusOwner.html#method.open" title="associated function oden_plugin_rs::message_bus::BusOwner::open"><code>BusOwner::open</code></a> allocates every bus through
+that factory, so both the bus vtable code and the <code>BusState</code> reside in the
+host binary and stay valid across any plugin DLL/SO unload.</p>
+<p>Oden does this by linking this crate into the host (via <code>oden_rs</code>) and calling
+<a href="fn.host_factory_record.html" title="fn oden_plugin_rs::message_bus::host::host_factory_record"><code>host_factory_record</code></a> there; the record’s function pointers therefore point
+into the host’s own copy of <code>imp</code>, not into any plugin.</p>
+</div></details><h2 id="constants" class="section-header">Constants<a href="#constants" class="anchor">§</a></h2><dl class="item-table"><dt><a class="constant" href="constant.HOST_FACTORY_KEY.html" title="constant oden_plugin_rs::message_bus::host::HOST_FACTORY_KEY">HOST_<wbr>FACTORY_<wbr>KEY</a></dt><dd>Data-sharing key under which the host publishes its bus factory record.</dd><dt><a class="constant" href="constant.HOST_FACTORY_RECORD_SIZE.html" title="constant oden_plugin_rs::message_bus::host::HOST_FACTORY_RECORD_SIZE">HOST_<wbr>FACTORY_<wbr>RECORD_<wbr>SIZE</a></dt><dd>Size in bytes of the on-wire factory record. 8 (magic) + 1 (pointer width) +
+7 (reserved) + 8 (vtable) + 8 (reserved) = 32, mirroring the bus discovery record.</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.host_factory_record.html" title="fn oden_plugin_rs::message_bus::host::host_factory_record">host_<wbr>factory_<wbr>record</a></dt><dd>Serialize the factory record for this build’s <a href="../abi/struct.BusHostVTable.html" title="struct oden_plugin_rs::message_bus::abi::BusHostVTable"><code>BusHostVTable</code></a>. The record
+embeds pointers into whatever binary this crate is linked into, so it must
+only be published by a module that is never unloaded — in practice the host
+executable.</dd></dl></section></div></main></body></html>
