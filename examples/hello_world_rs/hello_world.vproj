@@ -1,0 +1,19 @@
+config : {
+    scene_manager : {
+        next_scene_id : 1;
+        scenes : ( {
+                scene_id : 0;
+                uuid : "75dc149e-8d64-4108-c32e-b36f3616fe42";
+                root_entity : {
+                    uuid : "227ebf17-ae84-486b-2495-7b7d9a143858";
+                    children : ( {
+                            uuid : "c298d52c-d792-4820-b155-4a13de3fc874";
+                            type : "plugin_entity";
+                            type_id : "185d4603-e803-4fa2-9f56-266782cf2e98";
+                            type_name : "Hello World from Rust";
+                        } );
+                };
+            } );
+    };
+    plugin_dll_path : "target/debug";
+};

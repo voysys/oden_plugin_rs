@@ -1,0 +1,95 @@
+config : {
+    scene_manager : {
+        next_scene_id : 1;
+        scenes : ( {
+                scene_id : 0;
+                uuid : "00ab5887-e843-4d98-b20c-80a760dfb0f4";
+                root_entity : {
+                    uuid : "32086c9e-587c-4ae0-de13-b058a31f8070";
+                    children : ( {
+                            id : "Streamer";
+                            uuid : "68c5bf7d-cad6-40bc-4d39-97049e58f5b1";
+                            position : [ 1.4, 0.6, -2.0 ];
+                            scale : [ 0.5, 0.5, 0.5 ];
+                            type : "remote_streamer";
+                            stream : {
+                                id : 1;
+                                uuid : "92badda7-f886-46b3-9693-9b1e50c68b6e";
+                                width : 3840;
+                                height : 1088;
+                                exposure_algo : {
+                                    regions : ( {
+                                            left : [ 0.0, 0.0 ];
+                                            right : [ 0.0, 1.0 ];
+                                        } );
+                                };
+                                capture : {
+                                    impl : "lltp";
+                                };
+                            };
+                            streamer_feedback : {
+                                show_graph : true;
+                            };
+                            net_settings : {
+                                links : ( {
+                                        mode : "receiver";
+                                    } );
+                            };
+                        }, {
+                            uuid : "a7cf6625-75de-40d8-cdb8-d142c1bf83c8";
+                            type : "plugin_entity";
+                            type_id : "5f74d482-930b-4284-a11f-8ecf11b807bd";
+                            type_name : "Statistics Logger";
+                            options : ( {
+                                    key : "active";
+                                    type : "int32";
+                                    data : 0;
+                                }, {
+                                    key : "save_path";
+                                    type : "string";
+                                    data : "";
+                                }, {
+                                    key : "basic_stats_active";
+                                    type : "int32";
+                                    data : 0;
+                                }, {
+                                    key : "extended_stats_active";
+                                    type : "int32";
+                                    data : 0;
+                                }, {
+                                    key : "remote_streamer_entity_name";
+                                    type : "string";
+                                    data : "Streamer";
+                                } );
+                        }, {
+                            uuid : "fdb6f72f-2225-4205-1e9e-872e695ea30e";
+                            position : [ 0.0, 0.0, -3.0 ];
+                            type : "panorama_video";
+                            pv : {
+                                type : "flat_video_config";
+                                streams : ( {
+                                        id : 1;
+                                        uuid : "c77c1f84-2c65-45a0-75fb-92ffc2d1ae69";
+                                        type : "video";
+                                        width : 3840;
+                                        height : 1088;
+                                        exposure_algo : {
+                                            regions : ( {
+                                                    left : [ 0.0, 0.0 ];
+                                                    right : [ 0.0, 1.0 ];
+                                                } );
+                                        };
+                                        capture : {
+                                            impl : "clone";
+                                            clone_stream : "92badda7-f886-46b3-9693-9b1e50c68b6e";
+                                            sync_calibration : true;
+                                            sync_crop_and_vignetting : true;
+                                        };
+                                    } );
+                            };
+                        } );
+                };
+            } );
+    };
+    plugin_dll_path : "target/debug";
+};

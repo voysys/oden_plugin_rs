@@ -1,0 +1,149 @@
+config : {
+    scene_manager : {
+        next_scene_id : 1;
+        scenes : ( {
+                scene_id : 0;
+                uuid : "78af0c2a-ad9e-492c-a54e-d64d3beb7617";
+                root_entity : {
+                    uuid : "58c240e7-44c5-40c9-2db6-7682a9797160";
+                    children : ( {
+                            uuid : "d25298e9-a752-469e-73d6-90a80ca250ff";
+                            type : "plugin_entity";
+                            type_id : "c9644797-0eeb-4083-9ab9-abfe10a07625";
+                            type_name : "Webview Messaging Example";
+                        }, {
+                            id : "left_cam";
+                            uuid : "4ea819fc-ae4d-48ef-b4f2-fa304a76362e";
+                            position : [ 0.0, 300.0, -3.0 ];
+                            type : "panorama_video";
+                            pv : {
+                                type : "flat_video_config";
+                                streams : ( {
+                                        id : 1;
+                                        uuid : "2da8220c-81f1-4078-7f8d-5e44718a7540";
+                                        type : "video";
+                                        width : 1920;
+                                        height : 1080;
+                                        exposure_algo : {
+                                            regions : ( {
+                                                    left : [ 0.0, 0.0 ];
+                                                    right : [ 0.0, 1.0 ];
+                                                } );
+                                        };
+                                        capture : {
+                                            impl : "encoder_test";
+                                            generator_type : "warehouse";
+                                        };
+                                    } );
+                            };
+                        }, {
+                            id : "front_cam";
+                            uuid : "89f1eeb3-d996-41af-3220-475dbda2c46c";
+                            position : [ 0.0, 300.0, -3.0 ];
+                            type : "panorama_video";
+                            pv : {
+                                type : "flat_video_config";
+                                streams : ( {
+                                        id : 1;
+                                        uuid : "62e78caf-dbff-42dd-b6ee-f635b3958e62";
+                                        type : "video";
+                                        width : 1920;
+                                        height : 1080;
+                                        exposure_algo : {
+                                            regions : ( {
+                                                    left : [ 0.0, 0.0 ];
+                                                    right : [ 0.0, 1.0 ];
+                                                } );
+                                        };
+                                        capture : {
+                                            impl : "encoder_test";
+                                        };
+                                    } );
+                            };
+                        }, {
+                            id : "right_cam";
+                            uuid : "9b8000fd-73d3-467f-6311-da1a257c7338";
+                            position : [ 0.0, 300.0, -3.0 ];
+                            type : "panorama_video";
+                            pv : {
+                                type : "flat_video_config";
+                                streams : ( {
+                                        id : 1;
+                                        uuid : "c0f42ff2-c0de-42f1-7992-1ef2c9501232";
+                                        type : "video";
+                                        width : 1280;
+                                        height : 720;
+                                        exposure_algo : {
+                                            regions : ( {
+                                                    left : [ 0.0, 0.0 ];
+                                                    right : [ 0.0, 1.0 ];
+                                                } );
+                                        };
+                                        capture : {
+                                            impl : "gstreamer";
+                                            pipeline : "videotestsrc pattern=0 ! video/x-raw, width=1280, height=720";
+                                            pixel_format : "rgba";
+                                            use_nvdec : false;
+                                            use_sync : true;
+                                            gui_settings : {
+                                                type : "video_test_src";
+                                            };
+                                        };
+                                    } );
+                            };
+                        }, {
+                            id : "rear_cam";
+                            uuid : "9ea77cff-07b1-4794-91d6-cf2d899cf333";
+                            position : [ 0.0, 300.0, -3.0 ];
+                            type : "panorama_video";
+                            pv : {
+                                type : "flat_video_config";
+                                streams : ( {
+                                        id : 1;
+                                        uuid : "b394b254-6a79-4b82-12e0-9228c1e32a01";
+                                        type : "video";
+                                        width : 1280;
+                                        height : 720;
+                                        exposure_algo : {
+                                            regions : ( {
+                                                    left : [ 0.0, 0.0 ];
+                                                    right : [ 0.0, 1.0 ];
+                                                } );
+                                        };
+                                        capture : {
+                                            impl : "gstreamer";
+                                            pipeline : "videotestsrc pattern=1 ! video/x-raw, width=1280, height=720";
+                                            pixel_format : "rgba";
+                                            use_nvdec : false;
+                                            use_sync : true;
+                                            gui_settings : {
+                                                type : "video_test_src";
+                                                pattern : "snow";
+                                            };
+                                        };
+                                    } );
+                            };
+                        } );
+                };
+            } );
+    };
+    plugin_dll_paths : [ "target/debug" ];
+    stream_settings : {
+        type : "realtime_nvenc_gstreamer";
+        net_settings : {
+            links : ( {
+                    uuid : "8a29241f-7989-45fc-3cc0-a59a66db40e7";
+                } );
+        };
+        encoder_settings : {
+            use_custom_resolution : true;
+            height : 1088;
+            frame_rate : "f_r_60";
+            color_format : "y_cb_cr_hd_full";
+            intra_refresh : true;
+            codec : "hevc";
+            preset : "low_latency_high_performance";
+            rate_control_mode : "cbr";
+        };
+    };
+};

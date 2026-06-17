@@ -420,6 +420,71 @@ fn u8_to_hex(mut i: u8) -> char {
     (b'a' + i - 10) as char
 }
 
+impl Uuid {
+    /// Parse a canonical hyphenated UUID string, `None` if malformed.
+    pub const fn try_parse(s: &str) -> Option<Self> {
+        const HEX: [u8; 256] = {
+            let mut t = [0xFFu8; 256];
+            let mut i = 0u8;
+            while i < 10 {
+                t[(b'0' + i) as usize] = i;
+                i += 1;
+            }
+            let mut i = 0u8;
+            while i < 6 {
+                t[(b'a' + i) as usize] = 10 + i;
+                t[(b'A' + i) as usize] = 10 + i;
+                i += 1;
+            }
+            t
+        };
+        const PAIR_POS: [usize; 16] = [0, 2, 4, 6, 9, 11, 14, 16, 19, 21, 24, 26, 28, 30, 32, 34];
+
+        let b = s.as_bytes();
+        if b.len() != 36 || b[8] != b'-' || b[13] != b'-' || b[18] != b'-' || b[23] != b'-' {
+            return None;
+        }
+
+        let mut uuid = [0u8; 16];
+        let mut k = 0;
+        while k < 16 {
+            let i = PAIR_POS[k];
+            let hi = HEX[b[i] as usize];
+            let lo = HEX[b[i + 1] as usize];
+            if (hi | lo) > 0x0F {
+                return None;
+            }
+            uuid[k] = (hi << 4) | lo;
+            k += 1;
+        }
+
+        Some(Uuid { uuid })
+    }
+
+    /// Parse a canonical hyphenated UUID string. Evaluable in `const` context,
+    /// so a malformed literal is rejected at compile time:
+    ///
+    /// ```
+    /// use oden_plugin_rs::math::Uuid;
+    /// const BUS: Uuid = Uuid::parse("f6599e51-0ea3-46c1-9907-0e7d0334a807");
+    /// ```
+    ///
+    /// ```compile_fail
+    /// use oden_plugin_rs::math::Uuid;
+    /// const BAD: Uuid = Uuid::parse("not-a-uuid");
+    /// ```
+    ///
+    /// For strings only known at runtime, use [`std::str::FromStr`], which
+    /// returns an error instead of panicking.
+    #[track_caller]
+    pub const fn parse(s: &str) -> Self {
+        match Self::try_parse(s) {
+            Some(uuid) => uuid,
+            None => panic!("invalid UUID: expected 36 characters in 8-4-4-4-12 hex format"),
+        }
+    }
+}
+
 impl Display for Uuid {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (i, v) in self.uuid.iter().enumerate() {
@@ -440,43 +505,7 @@ impl FromStr for Uuid {
     type Err = Box<dyn Error>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s.len() != 36
-            || s.chars().nth(8) != Some('-')
-            || s.chars().nth(13) != Some('-')
-            || s.chars().nth(18) != Some('-')
-            || s.chars().nth(23) != Some('-')
-        {
-            return Err("Invalid Uuid Format!".into());
-        }
-
-        let mut parts = s.split('-');
-
-        let p1 = u64::from_str_radix(parts.next().ok_or("Missing part 1 of Uuid")?, 16)?;
-        let p2 = u16::from_str_radix(parts.next().ok_or("Missing part 2 of Uuid")?, 16)?;
-        let p3 = u16::from_str_radix(parts.next().ok_or("Missing part 3 of Uuid")?, 16)?;
-        let p4 = u16::from_str_radix(parts.next().ok_or("Missing part 4 of Uuid")?, 16)?;
-        let p5 = u64::from_str_radix(parts.next().ok_or("Missing part 5 of Uuid")?, 16)?;
-
-        Ok(Uuid {
-            uuid: [
-                (p1 >> 24) as u8,
-                (p1 >> 16) as u8,
-                (p1 >> 8) as u8,
-                p1 as u8,
-                (p2 >> 8) as u8,
-                p2 as u8,
-                (p3 >> 8) as u8,
-                p3 as u8,
-                (p4 >> 8) as u8,
-                p4 as u8,
-                (p5 >> 40) as u8,
-                (p5 >> 32) as u8,
-                (p5 >> 24) as u8,
-                (p5 >> 16) as u8,
-                (p5 >> 8) as u8,
-                p5 as u8,
-            ],
-        })
+        Self::try_parse(s).ok_or_else(|| "Invalid Uuid Format!".into())
     }
 }
 
@@ -518,5 +547,131 @@ mod tests {
     fn missing_uuid_part() {
         let uuid_str = "550e8400-e29b-41d4--446655440000";
         assert!(Uuid::from_str(uuid_str).is_err());
+    }
+
+    #[test]
+    fn parse_in_const_context_matches_runtime() {
+        const UUID: Uuid = Uuid::parse("550e8400-e29b-41d4-a716-446655440000");
+        let runtime = Uuid::from_str("550e8400-e29b-41d4-a716-446655440000").unwrap();
+        assert_eq!(UUID.uuid, runtime.uuid);
+    }
+
+    #[test]
+    fn parse_is_case_insensitive() {
+        let lower = Uuid::try_parse("550e8400-e29b-41d4-a716-446655440aff").unwrap();
+        let upper = Uuid::try_parse("550E8400-E29B-41D4-A716-446655440AFF").unwrap();
+        let mixed = Uuid::try_parse("550e8400-E29B-41d4-A716-446655440aFf").unwrap();
+        assert_eq!(lower.uuid, upper.uuid);
+        assert_eq!(lower.uuid, mixed.uuid);
+    }
+
+    #[test]
+    fn parse_display_round_trip() {
+        for s in [
+            "00000000-0000-0000-0000-000000000000",
+            "ffffffff-ffff-ffff-ffff-ffffffffffff",
+            "550e8400-e29b-41d4-a716-446655440000",
+            "01234567-89ab-cdef-0123-456789abcdef",
+        ] {
+            assert_eq!(Uuid::try_parse(s).unwrap().to_string(), s);
+        }
+    }
+
+    #[test]
+    fn nil_and_max_values() {
+        let nil = Uuid::try_parse("00000000-0000-0000-0000-000000000000").unwrap();
+        assert_eq!(nil.uuid, [0u8; 16]);
+        let max = Uuid::try_parse("ffffffff-ffff-ffff-ffff-ffffffffffff").unwrap();
+        assert_eq!(max.uuid, [0xFFu8; 16]);
+    }
+
+    #[test]
+    fn rejects_bytes_adjacent_to_hex_ranges() {
+        for c in ['/', ':', '`', 'g', '@', 'G'] {
+            let s = format!("{c}50e8400-e29b-41d4-a716-446655440000");
+            assert!(Uuid::try_parse(&s).is_none(), "accepted {c:?}");
+        }
+    }
+
+    #[test]
+    fn accepts_exactly_the_hex_digits_in_every_pair_position() {
+        for b in 0u8..=127 {
+            let mut bytes = *b"00000000-0000-0000-0000-000000000000";
+            bytes[0] = b;
+            let s = std::str::from_utf8(&bytes).unwrap();
+            assert_eq!(
+                Uuid::try_parse(s).is_some(),
+                b.is_ascii_hexdigit(),
+                "byte {b:#04x}"
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_hyphen_anywhere_but_the_four_separators() {
+        let canonical = *b"550e8400-e29b-41d4-a716-446655440000";
+        for i in 0..36 {
+            if canonical[i] == b'-' {
+                continue;
+            }
+            let mut bytes = canonical;
+            bytes[i] = b'-';
+            let s = std::str::from_utf8(&bytes).unwrap();
+            assert!(Uuid::try_parse(s).is_none(), "accepted '-' at index {i}");
+        }
+    }
+
+    #[test]
+    fn rejects_multibyte_utf8_of_matching_byte_length() {
+        let s = "é50e8400-e29b-41d4-a716-44665544000";
+        assert_eq!(s.len(), 36);
+        assert!(Uuid::try_parse(s).is_none());
+    }
+
+    #[test]
+    fn rejects_unicode_lookalikes_at_exact_byte_length() {
+        let cases = [
+            "あいうえおかきくけこさし",
+            "あe8400-e29b-41d4-a716-446655440000",
+            "０e8400-e29b-41d4-a716-446655440000",
+            "🦀8400-e29b-41d4-a716-446655440000",
+            "550e84\u{2010}e29b-41d4-a716-446655440000",
+            "550e8400-e29b-41d4-a716-446655440\u{200b}",
+            "e\u{301}e8400-e29b-41d4-a716-446655440000",
+            "\u{202e}e8400-e29b-41d4-a716-446655440000",
+            "\u{feff}e8400-e29b-41d4-a716-446655440000",
+            "550e8400-e29b-41d4-a716-44665544000\0",
+        ];
+        for s in cases {
+            assert_eq!(s.len(), 36, "case {s:?} must be exactly 36 bytes");
+            assert!(Uuid::try_parse(s).is_none(), "accepted {s:?}");
+        }
+    }
+
+    #[test]
+    fn rejects_fullwidth_uuid_lookalike_with_36_chars_but_more_bytes() {
+        let s = "５５０ｅ８４００－ｅ２９ｂ－４１ｄ４－ａ７１６－４４６６５５４４００００";
+        assert_eq!(s.chars().count(), 36);
+        assert!(s.len() > 36);
+        assert!(Uuid::try_parse(s).is_none());
+    }
+
+    #[test]
+    fn rejects_sign_characters_accepted_by_from_str_radix() {
+        assert!(Uuid::try_parse("+50e8400-e29b-41d4-a716-446655440000").is_none());
+        assert!(Uuid::try_parse("550e8400-e29b-41d4-a716-+46655440000").is_none());
+    }
+
+    #[test]
+    fn rejects_wrong_lengths() {
+        assert!(Uuid::try_parse("").is_none());
+        assert!(Uuid::try_parse("550e8400-e29b-41d4-a716-44665544000").is_none());
+        assert!(Uuid::try_parse("550e8400-e29b-41d4-a716-4466554400000").is_none());
+    }
+
+    #[test]
+    #[should_panic(expected = "invalid UUID")]
+    fn parse_panics_on_malformed_input() {
+        let _ = Uuid::parse("not-a-uuid");
     }
 }

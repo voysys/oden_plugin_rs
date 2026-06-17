@@ -23,6 +23,17 @@
 //! > **Note**: The UUID that identifies a plugin needs to be unique for each
 //! > plugin. Generators for UUIDs can be found freely online.
 //!
+//! # Calling API methods
+//! Each plugin callback receives a `*Params` value (for example
+//! [`InitParams`], [`UpdateParams`] or [`GuiParams`]). The whole API is exposed
+//! as methods you call directly on that value, e.g. `api.dt()` or
+//! `api.im_draw_add_text(..)`.
+//!
+//! These methods are declared on traits such as [`UpdateApi`] and
+//! [`SettingsApi`], but they are re-exposed as *inherent* methods on the
+//! `*Params` structs. You therefore do **not** need to import the `*Api` traits
+//! to call them — doing so only produces "unused import" warnings.
+//!
 //! # Plugin Structure
 //!
 //! Filename: hello_world.rs
@@ -178,13 +189,6 @@
 //!
 //! > **Important Note**: Hot reloading is highly discouraged for production use and
 //! > should only be used in development!
-//!
-//! # Copyright Notice
-//!
-//! Copyright 2014-2024 Voysys AB. All rights reserved.
-//! Voysys is a registered trademark.
-//! All other company and product names may be trade marks of their
-//! respective companies with which they are associated.
 
 #![warn(missing_docs)]
 // uncomment to check which functions does not have any documentation
@@ -212,6 +216,7 @@ pub mod im_draw_api;
 pub mod init_and_update_api;
 pub mod input_api;
 pub mod math;
+pub mod message_bus;
 pub mod named_mpmc_channel;
 pub mod named_shared_data;
 pub mod scene_api;
@@ -251,6 +256,7 @@ pub use gui_params::GuiParams;
 pub use im_draw_api::ImDrawApi;
 pub use init_and_update_api::{FontDescriptor, InitAndUpdateApi};
 pub use init_params::InitParams;
+pub use message_bus::{BusClient, BusOwner, OwnedMessage, RecvFuture, SendError, Subscription};
 pub use neural_networks::{InferenceSettings, NeuralNetworkInfo, TensorData, TensorInput};
 pub use oden_plugin::{
     OdenPlugin, OdenPluginHasNoProperties, OdenPluginMockable, OdenPluginWithProperties,
@@ -283,8 +289,9 @@ pub use plugin_h::{
     OdenEventType_e_OdenEventTypeWindowResize as EventTypeWindowResize,
     OdenFpsCameraType_e_OdenFpsCameraTypeFps as FpsCameraTypeFps,
     OdenFpsCameraType_e_OdenFpsCameraTypeOrbit as FpsCameraTypeOrbit,
-    OdenGamepadState_s as GamepadState, OdenGlLoaderFunc as GlLoader, OdenLinkError_e as LinkError,
-    OdenLinkMode as LinkMode, OdenLinkP2PStatusWrapper_s as LinkP2PStatusWrapper,
+    OdenGamepadStateV2_s as GamepadState, OdenGlLoaderFunc as GlLoader,
+    OdenLinkError_e as LinkError, OdenLinkMode as LinkMode,
+    OdenLinkP2PStatusWrapper_s as LinkP2PStatusWrapper,
     OdenLinkStatsInterfaceStatistics as LinkStatsInterfaceStatistics,
     OdenLogLevel_e_OdenLogCritical as LogCritical, OdenLogLevel_e_OdenLogDebug as LogDebug,
     OdenLogLevel_e_OdenLogError as LogError, OdenLogLevel_e_OdenLogInfo as LogInfo,

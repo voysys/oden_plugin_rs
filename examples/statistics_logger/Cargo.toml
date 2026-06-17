@@ -1,0 +1,22 @@
+[package]
+name = "statistics_logger"
+version = "0.2.0"
+authors = [
+    "Niclas Olmenius <niclas@voysys.se>, Torkel Danielsson <torkel@voysys.se>",
+]
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+chrono = "0.4"
+csv = "1"
+oden_plugin_rs = { path = "../../oden_plugin_rs" }
+oden_plugin_rs-derive = { path = "../../oden_plugin_rs-derive" }
+serde = { version = "1", default-features = false, features = ["derive"] }
+thiserror = "1"
+
+[workspace]
+members = []

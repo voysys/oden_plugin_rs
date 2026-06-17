@@ -4,7 +4,7 @@
 
 use crate::{
     plugin_h::{OdenGamepadState_s, OdenJoystickState_s, OdenPluginGlobalFunctions},
-    GamepadState, JoystickState, ODEN_GLOBAL,
+    JoystickState, ODEN_GLOBAL,
 };
 
 /// Check if a joystick with the given id is present.
@@ -115,34 +115,34 @@ pub struct Gamepad {
     pub dpad_right: bool,
 }
 
-impl From<GamepadState> for Gamepad {
-    fn from(state: GamepadState) -> Self {
-        use crate::GamepadAxis::*;
-        use crate::GamepadButton::*;
+impl From<OdenGamepadState_s> for Gamepad {
+    fn from(state: OdenGamepadState_s) -> Self {
+        let button = |i: usize| state.buttons.get(i).copied().unwrap_or(0) != 0;
+        let axis = |i: usize| *state.axes.get(i).unwrap_or(&0.0);
         Self {
             id: state.id,
             uuid: state.uuid,
-            left_x: state.axis_value(LeftX),
-            left_y: state.axis_value(LeftY),
-            right_x: state.axis_value(RightX),
-            right_y: state.axis_value(RightY),
-            left_trigger: state.axis_value(LeftTrigger) * 0.5 + 0.5,
-            right_trigger: state.axis_value(RightTrigger) * 0.5 + 0.5,
-            south: state.button_pressed(A),
-            east: state.button_pressed(B),
-            west: state.button_pressed(X),
-            north: state.button_pressed(Y),
-            back: state.button_pressed(Back),
-            guide: state.button_pressed(Guide),
-            start: state.button_pressed(Start),
-            left_stick: state.button_pressed(LeftThumb),
-            right_stick: state.button_pressed(RightThumb),
-            left_shoulder: state.button_pressed(LeftBumper),
-            right_shoulder: state.button_pressed(RightBumper),
-            dpad_up: state.button_pressed(DpadUp),
-            dpad_down: state.button_pressed(DpadDown),
-            dpad_left: state.button_pressed(DpadLeft),
-            dpad_right: state.button_pressed(DpadRight),
+            left_x: axis(0),
+            left_y: axis(1),
+            right_x: axis(2),
+            right_y: axis(3),
+            left_trigger: axis(4) * 0.5 + 0.5,
+            right_trigger: axis(5) * 0.5 + 0.5,
+            south: button(0),
+            east: button(1),
+            west: button(2),
+            north: button(3),
+            left_shoulder: button(4),
+            right_shoulder: button(5),
+            back: button(6),
+            start: button(7),
+            guide: button(8),
+            left_stick: button(9),
+            right_stick: button(10),
+            dpad_up: button(11),
+            dpad_right: button(12),
+            dpad_down: button(13),
+            dpad_left: button(14),
         }
     }
 }
