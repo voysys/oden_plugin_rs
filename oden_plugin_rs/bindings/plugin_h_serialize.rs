@@ -136,6 +136,7 @@ pub const PLUGIN_JOYSTICK_15: u32 = 14;
 pub const PLUGIN_JOYSTICK_16: u32 = 15;
 pub const PLUGIN_JOYSTICK_LAST: u32 = 15;
 pub const PLUGIN_JOYSTICK_MAX_AXES: u32 = 128;
+pub const PLUGIN_GAMEPAD_BUTTON_COUNT: u32 = 26;
 pub const PLUGIN_KEY_UNKNOWN: i32 = -1;
 pub const PLUGIN_KEY_SPACE: u32 = 32;
 pub const PLUGIN_KEY_APOSTROPHE: u32 = 39;
@@ -948,6 +949,15 @@ pub struct OdenGamepadState_s {
     pub axes: [f32; 6usize],
 }
 pub type OdenGamepadState = OdenGamepadState_s;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub struct OdenGamepadStateV2_s {
+    pub id: i32,
+    pub uuid: OdenUuid,
+    pub buttons: [::std::os::raw::c_uchar; 26usize],
+    pub axes: [f32; 6usize],
+}
+pub type OdenGamepadStateV2 = OdenGamepadStateV2_s;
 pub type OdenIsJoystickPresentFunc =
     ::std::option::Option<unsafe extern "C" fn(joystickId: i32) -> bool>;
 pub type OdenGetJoystickStateFunc = ::std::option::Option<
@@ -955,6 +965,9 @@ pub type OdenGetJoystickStateFunc = ::std::option::Option<
 >;
 pub type OdenGetGamepadStateFunc = ::std::option::Option<
     unsafe extern "C" fn(joystickId: i32, gamepadStateOut: *mut OdenGamepadState) -> bool,
+>;
+pub type OdenGetGamepadStateV2Func = ::std::option::Option<
+    unsafe extern "C" fn(joystickId: i32, gamepadStateOut: *mut OdenGamepadStateV2) -> bool,
 >;
 pub type OdenGetGamepadFunc =
     ::std::option::Option<unsafe extern "C" fn(gamepadStateOut: *mut OdenGamepadState) -> bool>;
@@ -994,7 +1007,8 @@ pub struct OdenPluginGlobalFunctions_s {
     pub getGamepad: OdenGetGamepadFunc,
     pub addGamepadMapping: OdenAddGamepadMappingFunc,
     pub getPowerInfo: OdenGetPowerInfoFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 229usize],
+    pub getGamepadStateV2: OdenGetGamepadStateV2Func,
+    pub reserved: [*mut ::std::os::raw::c_void; 228usize],
 }
 impl Default for OdenPluginGlobalFunctions_s {
     fn default() -> Self {
@@ -1837,6 +1851,7 @@ pub enum OdenSceneParamType_e {
     OdenSceneParamTypeEntityScale = 43,
     OdenSceneParamTypeBackgroundColor = 44,
     OdenSceneParamTypeClearBackgroundColor = 45,
+    OdenSceneParamTypeDropDetectorTimeout = 46,
     OdenSceneParamTypeMaxEnum = 2147483647,
 }
 pub use self::OdenSceneParamType_e as OdenSceneParamType;
@@ -2750,6 +2765,25 @@ impl Default for OdenSceneParamClearBackgroundColor_s {
     }
 }
 pub type OdenSceneParamClearBackgroundColor = OdenSceneParamClearBackgroundColor_s;
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct OdenSceneParamDropDetectorTimeout_s {
+    pub type_: OdenSceneParamType,
+    pub next: *mut ::std::os::raw::c_void,
+    pub entityId: *const ::std::os::raw::c_char,
+    pub streamIndex: i32,
+    pub timeoutMs: f32,
+}
+impl Default for OdenSceneParamDropDetectorTimeout_s {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type OdenSceneParamDropDetectorTimeout = OdenSceneParamDropDetectorTimeout_s;
 pub type OdenGetHorizonFunc = ::std::option::Option<
     unsafe extern "C" fn(entity: *const ::std::os::raw::c_char, horizon: *mut OdenVec3) -> bool,
 >;
@@ -4221,7 +4255,8 @@ pub struct OdenPluginEntityUpdateParams_s {
     pub isKeyPressedSinceLastSwap: OdenInputIsKeyPressedSinceLastSwapFunc,
     pub getKeysPressedSinceLastSwap: OdenInputGetKeysPressedSinceLastSwap,
     pub getWindowEvents: OdenInputGetWindowEventsFunc,
-    pub inputReserved: [*mut ::std::os::raw::c_void; 3usize],
+    pub getGamepadStateV2: OdenGetGamepadStateV2Func,
+    pub inputReserved: [*mut ::std::os::raw::c_void; 2usize],
     pub comChannelMaxMessageSize: OdenComChannelMaxMessageSizeFunc,
     pub comChannelSendMessage: OdenComChannelSendMessageFunc,
     pub comChannelGetMessageCount: OdenComChannelGetMessageCountFunc,
@@ -4493,7 +4528,8 @@ pub struct OdenPluginEntityDrawParams_s {
     pub isKeyPressedSinceLastSwap: OdenInputIsKeyPressedSinceLastSwapFunc,
     pub getKeysPressedSinceLastSwap: OdenInputGetKeysPressedSinceLastSwap,
     pub getWindowEvents: OdenInputGetWindowEventsFunc,
-    pub inputReserved: [*mut ::std::os::raw::c_void; 3usize],
+    pub getGamepadStateV2: OdenGetGamepadStateV2Func,
+    pub inputReserved: [*mut ::std::os::raw::c_void; 2usize],
     pub comChannelMaxMessageSize: OdenComChannelMaxMessageSizeFunc,
     pub comChannelSendMessage: OdenComChannelSendMessageFunc,
     pub comChannelGetMessageCount: OdenComChannelGetMessageCountFunc,
@@ -4797,7 +4833,8 @@ pub struct OdenPluginEntityGuiParams_s {
     pub isKeyPressedSinceLastSwap: OdenInputIsKeyPressedSinceLastSwapFunc,
     pub getKeysPressedSinceLastSwap: OdenInputGetKeysPressedSinceLastSwap,
     pub getWindowEvents: OdenInputGetWindowEventsFunc,
-    pub inputReserved: [*mut ::std::os::raw::c_void; 3usize],
+    pub getGamepadStateV2: OdenGetGamepadStateV2Func,
+    pub inputReserved: [*mut ::std::os::raw::c_void; 2usize],
     pub comChannelMaxMessageSize: OdenComChannelMaxMessageSizeFunc,
     pub comChannelSendMessage: OdenComChannelSendMessageFunc,
     pub comChannelGetMessageCount: OdenComChannelGetMessageCountFunc,

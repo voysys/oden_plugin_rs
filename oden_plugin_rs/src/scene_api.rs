@@ -441,28 +441,7 @@ pub struct RigidBodyUuid {
     pub colliders: Vec<Collider>,
 }
 
-/// Gamepad button indices corresponding to GLFW’s layout.
-#[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GamepadButton {
-    A = 0,
-    B,
-    X,
-    Y,
-    LeftBumper,
-    RightBumper,
-    Back,
-    Start,
-    Guide,
-    LeftThumb,
-    RightThumb,
-    DpadUp,
-    DpadRight,
-    DpadDown,
-    DpadLeft,
-}
-
-/// Gamepad axis indices corresponding to GLFW’s layout.
+/// Gamepad axis indices corresponding to SDL3's `SDL_GamepadAxis` layout.
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GamepadAxis {
@@ -474,7 +453,35 @@ pub enum GamepadAxis {
     RightTrigger,
 }
 
-impl crate::plugin_h::OdenGamepadState_s {
+/// Gamepad button indices corresponding to SDL3's `SDL_GamepadButton` layout,
+/// used to index [`GamepadState`](crate::GamepadState)'s `buttons` array.
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GamepadButton {
+    South = 0,
+    East,
+    West,
+    North,
+    Back,
+    Guide,
+    Start,
+    LeftStick,
+    RightStick,
+    LeftShoulder,
+    RightShoulder,
+    DpadUp,
+    DpadDown,
+    DpadLeft,
+    DpadRight,
+    Misc1,
+    RightPaddle1,
+    LeftPaddle1,
+    RightPaddle2,
+    LeftPaddle2,
+    Touchpad,
+}
+
+impl crate::plugin_h::OdenGamepadStateV2_s {
     /// Returns whether the specified gamepad button is pressed.
     #[inline]
     pub fn button_pressed(&self, button: GamepadButton) -> bool {
@@ -856,6 +863,13 @@ pub trait SceneApi {
         entity: &str,
         stream: i32,
         crop: &Vec4,
+    ) -> Result<(), SceneParamError>;
+    fn drop_detector_timeout(&self, entity: &str, stream: i32) -> Result<f32, SceneParamError>;
+    fn set_drop_detector_timeout(
+        &self,
+        entity: &str,
+        stream: i32,
+        timeout_ms: f32,
     ) -> Result<(), SceneParamError>;
     fn entity_scale(&self, entity: &str) -> Result<Vec3, SceneParamError>;
     fn set_entity_scale(&self, entity: &str, scale: &Vec3) -> Result<(), SceneParamError>;
@@ -1607,19 +1621,18 @@ macro_rules! impl_scene_api {
             /// Returns the current state of the gamepad with the given `joystick_id`, or
             /// [`None`] if no gamepad is connected.
             ///
-            /// The returned [`OdenGamepadState`](crate::plugin_h::OdenGamepadState_s)
-            /// provides helper methods for safe access:
-            /// - [`button_pressed`](crate::plugin_h::OdenGamepadState::button_pressed)
-            /// - [`axis_value`](crate::plugin_h::OdenGamepadState::axis_value)
-            ///
-            /// Use [`GamepadButton`](crate::scene_api::GamepadButton) and [`GamepadButton`](crate::scene_api::GamepadAxis) for type-safe input queries.
+            /// The returned [`GamepadState`](crate::GamepadState) is indexed by
+            /// [`GamepadButton`](crate::scene_api::GamepadButton) (SDL3 layout) and
+            /// [`GamepadAxis`](crate::scene_api::GamepadAxis), and provides helper
+            /// methods [`button_pressed`](crate::GamepadState::button_pressed) and
+            /// [`axis_value`](crate::GamepadState::axis_value).
             ///
             /// # Example
             /// ```no_run
             /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
             ///       if let Some(state) = api.gamepad_state(0) {
-            ///           if state.button_pressed(oden_plugin_rs::GamepadButton::A) {
-            ///               println!("A pressed");
+            ///           if state.button_pressed(oden_plugin_rs::GamepadButton::South) {
+            ///               println!("South pressed");
             ///           }
             ///           let lx = state.axis_value(oden_plugin_rs::GamepadAxis::LeftX);
             ///           let ly = state.axis_value(oden_plugin_rs::GamepadAxis::LeftY);
@@ -1632,8 +1645,8 @@ macro_rules! impl_scene_api {
             pub fn gamepad_state(&self, joystick_id: i32) -> Option<$crate::GamepadState> {
                 unsafe {
                     let mut state = $crate::GamepadState::default();
-                    if let Some(get_gamepad_state) = (*self.inner).getGamepadState {
-                        if get_gamepad_state(joystick_id, &mut state as *mut _) {
+                    if let Some(get_gamepad_state_v2) = (*self.inner).getGamepadStateV2 {
+                        if get_gamepad_state_v2(joystick_id, &mut state as *mut _) {
                             Some(state)
                         } else {
                             None
@@ -5353,6 +5366,50 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the set_camera_hard_crop function");
+                }
+            }
+
+            pub fn drop_detector_timeout(&self, entity: &str, stream: i32) -> Result<f32, $crate::SceneParamError> {
+                if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
+                    let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
+
+                    let mut param = $crate::plugin_h::OdenSceneParamDropDetectorTimeout {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeDropDetectorTimeout,
+                        next: std::ptr::null_mut(),
+                        entityId: entity_id.as_ptr(),
+                        streamIndex: stream,
+                        timeoutMs: 0.0,
+                    };
+
+                    let res = unsafe { get_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(param.timeoutMs),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the drop_detector_timeout function");
+                }
+            }
+
+            pub fn set_drop_detector_timeout(&self, entity: &str, stream: i32, timeout_ms: f32) -> Result<(), $crate::SceneParamError> {
+                if let Some(set_scene_param) = unsafe { (*self.inner).setSceneParam } {
+                    let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
+
+                    let mut param = $crate::plugin_h::OdenSceneParamDropDetectorTimeout {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeDropDetectorTimeout,
+                        next: std::ptr::null_mut(),
+                        entityId: entity_id.as_ptr(),
+                        streamIndex: stream,
+                        timeoutMs: timeout_ms,
+                    };
+
+                    let res = unsafe { set_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(()),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the set_drop_detector_timeout function");
                 }
             }
 

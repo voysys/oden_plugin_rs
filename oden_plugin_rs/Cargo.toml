@@ -1,6 +1,6 @@
 [package]
 name = "oden_plugin_rs"
-version = "0.1.0"
+version = "50.0.0"
 authors = ["Jonathan Nilsson <jonathan@voysys.se>"]
 edition = "2021"
 publish = false
@@ -44,4 +44,7 @@ serde_json = { version = "1", optional = true }
 strum = { version = "0.26", optional = true }
 strum_macros = { version = "0.26", optional = true }
 zerocopy = "~0.6.6"
+
+[dev-dependencies]
+oden_plugin_rs = { path = ".", features = ["mock"] }
 

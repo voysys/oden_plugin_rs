@@ -212,6 +212,7 @@ pub mod im_draw_api;
 pub mod init_and_update_api;
 pub mod input_api;
 pub mod math;
+pub mod message_bus;
 pub mod named_mpmc_channel;
 pub mod named_shared_data;
 pub mod scene_api;
@@ -251,6 +252,7 @@ pub use gui_params::GuiParams;
 pub use im_draw_api::ImDrawApi;
 pub use init_and_update_api::{FontDescriptor, InitAndUpdateApi};
 pub use init_params::InitParams;
+pub use message_bus::{BusClient, BusOwner, OwnedMessage, RecvFuture, SendError, Subscription};
 pub use neural_networks::{InferenceSettings, NeuralNetworkInfo, TensorData, TensorInput};
 pub use oden_plugin::{
     OdenPlugin, OdenPluginHasNoProperties, OdenPluginMockable, OdenPluginWithProperties,
@@ -283,8 +285,9 @@ pub use plugin_h::{
     OdenEventType_e_OdenEventTypeWindowResize as EventTypeWindowResize,
     OdenFpsCameraType_e_OdenFpsCameraTypeFps as FpsCameraTypeFps,
     OdenFpsCameraType_e_OdenFpsCameraTypeOrbit as FpsCameraTypeOrbit,
-    OdenGamepadState_s as GamepadState, OdenGlLoaderFunc as GlLoader, OdenLinkError_e as LinkError,
-    OdenLinkMode as LinkMode, OdenLinkP2PStatusWrapper_s as LinkP2PStatusWrapper,
+    OdenGamepadStateV2_s as GamepadState, OdenGlLoaderFunc as GlLoader,
+    OdenLinkError_e as LinkError, OdenLinkMode as LinkMode,
+    OdenLinkP2PStatusWrapper_s as LinkP2PStatusWrapper,
     OdenLinkStatsInterfaceStatistics as LinkStatsInterfaceStatistics,
     OdenLogLevel_e_OdenLogCritical as LogCritical, OdenLogLevel_e_OdenLogDebug as LogDebug,
     OdenLogLevel_e_OdenLogError as LogError, OdenLogLevel_e_OdenLogInfo as LogInfo,
