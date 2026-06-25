@@ -270,6 +270,37 @@ pub const ODEN_FAULT_OCULUS_DISCONNECTED: u32 = 0;
 pub const ODEN_FAULT_HMD_DISCONNECTED: u32 = 0;
 pub const ODEN_FAULT_HMD_REMOVED_FROM_HEAD: u32 = 1;
 pub const PLUGIN_TENSOR_SHAPE_MAX_DIMS: u32 = 8;
+pub const ODEN_HAND_JOINT_PALM: u32 = 0;
+pub const ODEN_HAND_JOINT_WRIST: u32 = 1;
+pub const ODEN_HAND_JOINT_THUMB_METACARPAL: u32 = 2;
+pub const ODEN_HAND_JOINT_THUMB_PROXIMAL: u32 = 3;
+pub const ODEN_HAND_JOINT_THUMB_DISTAL: u32 = 4;
+pub const ODEN_HAND_JOINT_THUMB_TIP: u32 = 5;
+pub const ODEN_HAND_JOINT_INDEX_METACARPAL: u32 = 6;
+pub const ODEN_HAND_JOINT_INDEX_PROXIMAL: u32 = 7;
+pub const ODEN_HAND_JOINT_INDEX_INTERMEDIATE: u32 = 8;
+pub const ODEN_HAND_JOINT_INDEX_DISTAL: u32 = 9;
+pub const ODEN_HAND_JOINT_INDEX_TIP: u32 = 10;
+pub const ODEN_HAND_JOINT_MIDDLE_METACARPAL: u32 = 11;
+pub const ODEN_HAND_JOINT_MIDDLE_PROXIMAL: u32 = 12;
+pub const ODEN_HAND_JOINT_MIDDLE_INTERMEDIATE: u32 = 13;
+pub const ODEN_HAND_JOINT_MIDDLE_DISTAL: u32 = 14;
+pub const ODEN_HAND_JOINT_MIDDLE_TIP: u32 = 15;
+pub const ODEN_HAND_JOINT_RING_METACARPAL: u32 = 16;
+pub const ODEN_HAND_JOINT_RING_PROXIMAL: u32 = 17;
+pub const ODEN_HAND_JOINT_RING_INTERMEDIATE: u32 = 18;
+pub const ODEN_HAND_JOINT_RING_DISTAL: u32 = 19;
+pub const ODEN_HAND_JOINT_RING_TIP: u32 = 20;
+pub const ODEN_HAND_JOINT_PINKY_METACARPAL: u32 = 21;
+pub const ODEN_HAND_JOINT_PINKY_PROXIMAL: u32 = 22;
+pub const ODEN_HAND_JOINT_PINKY_INTERMEDIATE: u32 = 23;
+pub const ODEN_HAND_JOINT_PINKY_DISTAL: u32 = 24;
+pub const ODEN_HAND_JOINT_PINKY_TIP: u32 = 25;
+pub const ODEN_HAND_JOINT_COUNT: u32 = 26;
+pub const ODEN_HAND_FLAG_ACTIVE: u32 = 1;
+pub const ODEN_HAND_FLAG_LEFT: u32 = 2;
+pub const ODEN_HAND_FLAG_RIGHT: u32 = 4;
+pub const ODEN_HAND_FLAG_LOCAL: u32 = 8;
 pub const ODEN_PLUGIN_VERSION: u32 = 13;
 pub type __u_char = ::std::os::raw::c_uchar;
 pub type __u_short = ::std::os::raw::c_ushort;
@@ -977,6 +1008,22 @@ pub type OdenGetPowerInfoFunc = ::std::option::Option<
     unsafe extern "C" fn(seconds: *mut i32, percent: *mut i32, state: *mut OdenPowerState) -> bool,
 >;
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub struct OdenHandTrackingState_s {
+    pub flags: u8,
+    pub wrist_position: OdenVec3,
+    pub wrist_rotation: OdenQuat,
+    pub joint_positions: [OdenVec3; 26usize],
+}
+pub type OdenHandTrackingState = OdenHandTrackingState_s;
+pub type OdenGetHandTrackingStateFunc = ::std::option::Option<
+    unsafe extern "C" fn(hand: i32, stateOut: *mut OdenHandTrackingState) -> bool,
+>;
+pub type OdenHandToWorldFunc =
+    ::std::option::Option<unsafe extern "C" fn(state: *mut OdenHandTrackingState)>;
+pub type OdenHandToLocalFunc =
+    ::std::option::Option<unsafe extern "C" fn(state: *mut OdenHandTrackingState)>;
+#[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct OdenPluginGlobalFunctions_s {
     pub logInfo: OdenLogInfoFunc,
@@ -1008,7 +1055,10 @@ pub struct OdenPluginGlobalFunctions_s {
     pub addGamepadMapping: OdenAddGamepadMappingFunc,
     pub getPowerInfo: OdenGetPowerInfoFunc,
     pub getGamepadStateV2: OdenGetGamepadStateV2Func,
-    pub reserved: [*mut ::std::os::raw::c_void; 228usize],
+    pub getHandTrackingState: OdenGetHandTrackingStateFunc,
+    pub handToWorld: OdenHandToWorldFunc,
+    pub handToLocal: OdenHandToLocalFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 225usize],
 }
 impl Default for OdenPluginGlobalFunctions_s {
     fn default() -> Self {
