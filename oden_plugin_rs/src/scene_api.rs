@@ -871,6 +871,13 @@ pub trait SceneApi {
         stream: i32,
         timeout_ms: f32,
     ) -> Result<(), SceneParamError>;
+    fn show_no_signal_screen(&self, entity: &str, stream: i32) -> Result<bool, SceneParamError>;
+    fn set_show_no_signal_screen(
+        &self,
+        entity: &str,
+        stream: i32,
+        show: bool,
+    ) -> Result<(), SceneParamError>;
     fn entity_scale(&self, entity: &str) -> Result<Vec3, SceneParamError>;
     fn set_entity_scale(&self, entity: &str, scale: &Vec3) -> Result<(), SceneParamError>;
     fn raw_record_folder(&self) -> Result<String, SceneParamError>;
@@ -5410,6 +5417,50 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the set_drop_detector_timeout function");
+                }
+            }
+
+            pub fn show_no_signal_screen(&self, entity: &str, stream: i32) -> Result<bool, $crate::SceneParamError> {
+                if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
+                    let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
+
+                    let mut param = $crate::plugin_h::OdenSceneParamShowNoSignalScreen {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeShowNoSignalScreen,
+                        next: std::ptr::null_mut(),
+                        entityId: entity_id.as_ptr(),
+                        streamIndex: stream,
+                        show: false,
+                    };
+
+                    let res = unsafe { get_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(param.show),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the show_no_signal_screen function");
+                }
+            }
+
+            pub fn set_show_no_signal_screen(&self, entity: &str, stream: i32, show: bool) -> Result<(), $crate::SceneParamError> {
+                if let Some(set_scene_param) = unsafe { (*self.inner).setSceneParam } {
+                    let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
+
+                    let mut param = $crate::plugin_h::OdenSceneParamShowNoSignalScreen {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeShowNoSignalScreen,
+                        next: std::ptr::null_mut(),
+                        entityId: entity_id.as_ptr(),
+                        streamIndex: stream,
+                        show,
+                    };
+
+                    let res = unsafe { set_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(()),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the set_show_no_signal_screen function");
                 }
             }
 

@@ -15,7 +15,7 @@ build, or track `master` for the latest:
 
 ```toml
 # Pinned to a release
-oden_plugin_rs = { git = "https://github.com/voysys/oden_plugin_rs", tag = "v48.0" }
+oden_plugin_rs = { git = "https://github.com/voysys/oden_plugin_rs", tag = "v50.0" }
 
 # Latest
 oden_plugin_rs = { git = "https://github.com/voysys/oden_plugin_rs", branch = "master" }
@@ -25,7 +25,7 @@ The `Properties` derive macro lives in the companion `oden_plugin_rs-derive`
 crate in this repository:
 
 ```toml
-oden_plugin_rs-derive = { git = "https://github.com/voysys/oden_plugin_rs", tag = "v48.0" }
+oden_plugin_rs-derive = { git = "https://github.com/voysys/oden_plugin_rs", tag = "v50.0" }
 ```
 
 ## Quick start
