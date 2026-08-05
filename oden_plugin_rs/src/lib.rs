@@ -417,7 +417,8 @@ pub use plugin_h::{PLUGIN_MOD_ALT, PLUGIN_MOD_CONTROL, PLUGIN_MOD_SHIFT, PLUGIN_
 
 pub use scene_api::{
     CalibrationQuality, GamepadAxis, GamepadButton, JoystickState, KeyModifiers,
-    PerformanceMetrics, PlaybackTimes, QueryError, SceneApi, SceneApiExt,
+    PerformanceMetrics, PlaybackTimes, QueryError, SceneApi, SceneApiExt, TextureStreamingCodec,
+    TextureStreamingConfig, TextureStreamingError,
 };
 pub use settings_api::SettingsApi;
 #[cfg(feature = "serialize")]

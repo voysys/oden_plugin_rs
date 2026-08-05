@@ -506,6 +506,51 @@ pub type OdenPluginCodec_e = ::std::os::raw::c_uint;
 pub use self::OdenPluginCodec_e as OdenPluginCodec;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct OdenTextureStreamingConfig_s {
+    pub width: i32,
+    pub height: i32,
+    pub frame_rate: i32,
+    pub bitrate_kbps: i32,
+    pub codec: OdenPluginCodec,
+    pub output_pipeline: *const ::std::os::raw::c_char,
+    pub entity_id: *const ::std::os::raw::c_char,
+    pub stream: i32,
+    pub reserved_i32: [i32; 8usize],
+    pub reserved_ptr: [*mut ::std::os::raw::c_void; 4usize],
+}
+impl Default for OdenTextureStreamingConfig_s {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type OdenTextureStreamingConfig = OdenTextureStreamingConfig_s;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorOk: OdenTextureStreamingError_e = 0;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorUnknown:
+    OdenTextureStreamingError_e = 1;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorUnsupportedApplication:
+    OdenTextureStreamingError_e = 2;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorArgumentIsNull:
+    OdenTextureStreamingError_e = 3;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorUnsupportedCodec:
+    OdenTextureStreamingError_e = 4;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorOutputPipelineRequired:
+    OdenTextureStreamingError_e = 5;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorInvalidNumericField:
+    OdenTextureStreamingError_e = 6;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorVideoCaptureNotFound:
+    OdenTextureStreamingError_e = 7;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorNotConfigured:
+    OdenTextureStreamingError_e = 8;
+pub const OdenTextureStreamingError_e_OdenTextureStreamingErrorMaxEnum:
+    OdenTextureStreamingError_e = 2147483647;
+pub type OdenTextureStreamingError_e = ::std::os::raw::c_uint;
+pub use self::OdenTextureStreamingError_e as OdenTextureStreamingError;
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct OdenAsyncComChannelMessageId_s {
     pub messageId: *const ::std::os::raw::c_char,
     pub dataSize: i32,
@@ -3138,7 +3183,22 @@ pub type OdenGetStreamerBitrateMbpsFunc =
     ::std::option::Option<unsafe extern "C" fn(bitrateMbpsOut: *mut f32) -> bool>;
 pub type OdenStartStreamerFunc = ::std::option::Option<unsafe extern "C" fn()>;
 pub type OdenStopStreamerFunc = ::std::option::Option<unsafe extern "C" fn()>;
+pub type OdenConfigureTextureStreamingFunc = ::std::option::Option<
+    unsafe extern "C" fn(config: *const OdenTextureStreamingConfig) -> OdenTextureStreamingError,
+>;
 pub type OdenIsStreamerRunningFunc = ::std::option::Option<unsafe extern "C" fn() -> bool>;
+pub type OdenStartTextureStreamingFunc = ::std::option::Option<
+    unsafe extern "C" fn(
+        entity_id: *const ::std::os::raw::c_char,
+        stream: i32,
+    ) -> OdenTextureStreamingError,
+>;
+pub type OdenStopTextureStreamingFunc = ::std::option::Option<
+    unsafe extern "C" fn(
+        entity_id: *const ::std::os::raw::c_char,
+        stream: i32,
+    ) -> OdenTextureStreamingError,
+>;
 pub type OdenSetStreamerDestinationIpFunc =
     ::std::option::Option<unsafe extern "C" fn(ipAddress: *const ::std::os::raw::c_char) -> bool>;
 pub type OdenSetStreamerDestinationPortFunc =
@@ -4341,7 +4401,10 @@ pub struct OdenPluginEntityUpdateParams_s {
     pub setDewarpingParams: OdenSetDewarpingParamsFunc,
     pub preventClose: OdenPreventCloseFunc,
     pub closeWasDenied: OdenCloseWasDeniedFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 184usize],
+    pub configureTextureStreaming: OdenConfigureTextureStreamingFunc,
+    pub startTextureStreaming: OdenStartTextureStreamingFunc,
+    pub stopTextureStreaming: OdenStopTextureStreamingFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 181usize],
     pub clearLinkEncryptionAllowedPublicKeys: OdenClearLinkEncryptionAllowedPublicKeysFunc,
     pub setLinkToRelayLink: OdenSetLinkToRelayLinkFunc,
     pub isLinkRelayLink: OdenIsLinkRelayLinkFunc,
@@ -4626,7 +4689,10 @@ pub struct OdenPluginEntityDrawParams_s {
     pub getDewarpingParams: OdenGetDewarpingParamsFunc,
     pub setDewarpingParams: OdenSetDewarpingParamsFunc,
     pub getLinkTimeSinceLastReceivedPacketNs: OdenGetLinkTimeSinceLastReceivedPacketNsFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 179usize],
+    pub configureTextureStreaming: OdenConfigureTextureStreamingFunc,
+    pub startTextureStreaming: OdenStartTextureStreamingFunc,
+    pub stopTextureStreaming: OdenStopTextureStreamingFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 176usize],
     pub worldMatrix: OdenMatrix4,
     pub projMatrix: OdenMatrix4,
     pub viewportX: i32,
@@ -4925,7 +4991,10 @@ pub struct OdenPluginEntityGuiParams_s {
     pub getDewarpingParams: OdenGetDewarpingParamsFunc,
     pub setDewarpingParams: OdenSetDewarpingParamsFunc,
     pub getLinkTimeSinceLastReceivedPacketNs: OdenGetLinkTimeSinceLastReceivedPacketNsFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 204usize],
+    pub configureTextureStreaming: OdenConfigureTextureStreamingFunc,
+    pub startTextureStreaming: OdenStartTextureStreamingFunc,
+    pub stopTextureStreaming: OdenStopTextureStreamingFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 201usize],
 }
 #[repr(C)]
 #[derive(Copy, Clone)]

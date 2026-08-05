@@ -11,8 +11,8 @@ use crate::{
     update_api::UpdateApi,
     CalibrationQuality, CameraCalibration, CameraMetadata, CameraStreamState, GamepadState,
     ImDrawTextAlignment, KeyModifiers, LinkError, LinkMode, LinkStatsInterfaceStatistics,
-    MouseCursor, PlaybackTimes, RegulatorMode, SceneParamError, StreamStatistics, ViewportInfo,
-    WindowEvent, WindowMode,
+    MouseCursor, PlaybackTimes, RegulatorMode, SceneParamError, StreamStatistics,
+    TextureStreamingConfig, TextureStreamingError, ViewportInfo, WindowEvent, WindowMode,
 };
 
 use std::{ops::RangeInclusive, sync::mpsc::Receiver};
@@ -109,6 +109,9 @@ mockall::mock! {
         fn load_project(&self, path: &str);
         fn start_streamer(&self);
         fn stop_streamer(&self);
+        fn configure_texture_streaming(&self, config: &TextureStreamingConfig) -> Result<(), TextureStreamingError>;
+        fn start_texture_streaming(&self, entity_id: &str, stream: i32) -> Result<(), TextureStreamingError>;
+        fn stop_texture_streaming(&self, entity_id: &str, stream: i32) -> Result<(), TextureStreamingError>;
         fn camera_stream_state(&self, entity_id: &str, stream: i32) -> Option<CameraStreamState>;
         fn set_camera_stream_state(
             &self,

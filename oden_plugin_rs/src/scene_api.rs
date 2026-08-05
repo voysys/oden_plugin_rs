@@ -51,6 +51,102 @@ impl Error for LinkError {
     }
 }
 
+#[non_exhaustive]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serialize", derive(serde::Serialize, serde::Deserialize))]
+pub enum TextureStreamingError {
+    OdenTextureStreamingErrorOk,
+    OdenTextureStreamingErrorUnknown,
+    OdenTextureStreamingErrorUnsupportedApplication,
+    OdenTextureStreamingErrorArgumentIsNull,
+    OdenTextureStreamingErrorUnsupportedCodec,
+    OdenTextureStreamingErrorOutputPipelineRequired,
+    OdenTextureStreamingErrorInvalidNumericField,
+    OdenTextureStreamingErrorVideoCaptureNotFound,
+    OdenTextureStreamingErrorNotConfigured,
+    OdenTextureStreamingErrorArgumentContainsNul,
+}
+
+impl TextureStreamingError {
+    #[doc(hidden)]
+    pub fn from_raw(raw: crate::plugin_h::OdenTextureStreamingError) -> Self {
+        match raw {
+            crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorOk => {
+                TextureStreamingError::OdenTextureStreamingErrorOk
+            }
+            crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorUnsupportedApplication => {
+                TextureStreamingError::OdenTextureStreamingErrorUnsupportedApplication
+            }
+            crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorArgumentIsNull => {
+                TextureStreamingError::OdenTextureStreamingErrorArgumentIsNull
+            }
+            crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorUnsupportedCodec => {
+                TextureStreamingError::OdenTextureStreamingErrorUnsupportedCodec
+            }
+            crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorOutputPipelineRequired => {
+                TextureStreamingError::OdenTextureStreamingErrorOutputPipelineRequired
+            }
+            crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorInvalidNumericField => {
+                TextureStreamingError::OdenTextureStreamingErrorInvalidNumericField
+            }
+            crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorVideoCaptureNotFound => {
+                TextureStreamingError::OdenTextureStreamingErrorVideoCaptureNotFound
+            }
+            crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorNotConfigured => {
+                TextureStreamingError::OdenTextureStreamingErrorNotConfigured
+            }
+            _ => TextureStreamingError::OdenTextureStreamingErrorUnknown,
+        }
+    }
+}
+
+impl Display for TextureStreamingError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TextureStreamingError::OdenTextureStreamingErrorOk => write!(f, "Success"),
+            TextureStreamingError::OdenTextureStreamingErrorUnknown => {
+                write!(f, "Unknown error occurred")
+            }
+            TextureStreamingError::OdenTextureStreamingErrorUnsupportedApplication => {
+                write!(
+                    f,
+                    "UI streaming is not available in this application type or build"
+                )
+            }
+            TextureStreamingError::OdenTextureStreamingErrorArgumentIsNull => {
+                write!(f, "One of the arguments is null")
+            }
+            TextureStreamingError::OdenTextureStreamingErrorUnsupportedCodec => {
+                write!(f, "Unsupported codec (only H264 and H265 are accepted)")
+            }
+            TextureStreamingError::OdenTextureStreamingErrorOutputPipelineRequired => {
+                write!(f, "output_pipeline is required")
+            }
+            TextureStreamingError::OdenTextureStreamingErrorInvalidNumericField => {
+                write!(f, "Numeric fields must be non-negative")
+            }
+            TextureStreamingError::OdenTextureStreamingErrorVideoCaptureNotFound => {
+                write!(f, "No video capture found for the given entity_id/stream")
+            }
+            TextureStreamingError::OdenTextureStreamingErrorNotConfigured => {
+                write!(
+                    f,
+                    "No UI streaming configuration exists for the given entity_id/stream"
+                )
+            }
+            TextureStreamingError::OdenTextureStreamingErrorArgumentContainsNul => {
+                write!(f, "A string argument contains an interior NUL byte")
+            }
+        }
+    }
+}
+
+impl Error for TextureStreamingError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
 #[derive(Clone, Default, Debug)]
 pub struct RemoteCalibrationResult {
     pub floor_height: f32,
@@ -497,6 +593,26 @@ impl crate::plugin_h::OdenGamepadStateV2_s {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[cfg_attr(feature = "serialize", derive(serde::Serialize, serde::Deserialize))]
+pub enum TextureStreamingCodec {
+    #[default]
+    H264,
+    H265,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct TextureStreamingConfig {
+    pub width: i32,
+    pub height: i32,
+    pub frame_rate: i32,
+    pub bitrate_kbps: i32,
+    pub codec: TextureStreamingCodec,
+    pub output_pipeline: String,
+    pub entity_id: String,
+    pub stream: i32,
+}
+
 #[allow(clippy::needless_lifetimes)]
 #[cfg_attr(feature = "mock", mockall::automock)]
 pub trait SceneApi {
@@ -517,6 +633,20 @@ pub trait SceneApi {
     fn load_project(&self, path: &str);
     fn start_streamer(&self);
     fn stop_streamer(&self);
+    fn configure_texture_streaming(
+        &self,
+        config: &TextureStreamingConfig,
+    ) -> Result<(), TextureStreamingError>;
+    fn start_texture_streaming(
+        &self,
+        entity_id: &str,
+        stream: i32,
+    ) -> Result<(), TextureStreamingError>;
+    fn stop_texture_streaming(
+        &self,
+        entity_id: &str,
+        stream: i32,
+    ) -> Result<(), TextureStreamingError>;
     fn camera_stream_state(&self, entity_id: &str, stream: i32) -> Option<CameraStreamState>;
     fn set_camera_stream_state(
         &self,
@@ -1353,6 +1483,156 @@ macro_rules! impl_scene_api {
                     unsafe { stop_streamer() }
                 } else {
                     panic!("This version of Oden is too old to have the stop_streamer function");
+                }
+            }
+
+            /// Configures the OdenVR window streaming with the given `config`.
+            ///
+            /// A value of `0` in [`width`](crate::scene_api::TextureStreamingConfig::width) /
+            /// [`height`](crate::scene_api::TextureStreamingConfig::height) means
+            /// "use the source resolution", `0` in
+            /// [`frame_rate`](crate::scene_api::TextureStreamingConfig::frame_rate) means
+            /// "inherit the render rate", and `0` in
+            /// [`bitrate_kbps`](crate::scene_api::TextureStreamingConfig::bitrate_kbps)
+            /// selects a sane default. An empty
+            /// [`entity_id`](crate::scene_api::TextureStreamingConfig::entity_id)
+            /// captures the screen buffer; otherwise the
+            /// ([`entity_id`](crate::scene_api::TextureStreamingConfig::entity_id),
+            /// [`stream`](crate::scene_api::TextureStreamingConfig::stream)) pair targets
+            /// a specific video capture stream.
+            ///
+            /// Use [`start_texture_streaming`](Self::start_texture_streaming) and
+            /// [`stop_texture_streaming`](Self::stop_texture_streaming) to start/stop the texture streaming
+            ///
+            /// # Examples
+            /// ```no_run
+            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
+            /// api.configure_texture_streaming(&oden_plugin_rs::scene_api::TextureStreamingConfig {
+            ///     width: 0,
+            ///     height: 0,
+            ///     frame_rate: 0,
+            ///     bitrate_kbps: 0,
+            ///     codec: oden_plugin_rs::scene_api::TextureStreamingCodec::H264,
+            ///     output_pipeline: "h264parse ! rtph264pay ! udpsink host=127.0.0.1 port=5000".to_string(),
+            ///     entity_id: String::new(),
+            ///     stream: 0,
+            /// }).unwrap();
+            /// # }
+            /// ```
+            pub fn configure_texture_streaming(
+                &self,
+                config: &$crate::scene_api::TextureStreamingConfig,
+            ) -> Result<(), $crate::TextureStreamingError> {
+                let configure = match unsafe { (*self.inner).configureTextureStreaming } {
+                    Some(configure) => configure,
+                    None => panic!(
+                        "This version of Oden is too old to have the configure_texture_streaming function"
+                    ),
+                };
+
+                let pipeline = std::ffi::CString::new(
+                    config.output_pipeline.trim_end_matches('\0'),
+                )
+                .map_err(|_| $crate::TextureStreamingError::OdenTextureStreamingErrorArgumentContainsNul)?;
+
+                let entity_id = std::ffi::CString::new(
+                    config.entity_id.trim_end_matches('\0'),
+                )
+                .map_err(|_| $crate::TextureStreamingError::OdenTextureStreamingErrorArgumentContainsNul)?;
+
+                let codec = match config.codec {
+                    $crate::scene_api::TextureStreamingCodec::H264 =>
+                        $crate::plugin_h::OdenPluginCodec_e_OdenPluginCodecH264,
+                    $crate::scene_api::TextureStreamingCodec::H265 =>
+                        $crate::plugin_h::OdenPluginCodec_e_OdenPluginCodecH265,
+                };
+
+                let raw = $crate::plugin_h::OdenTextureStreamingConfig {
+                    width: config.width,
+                    height: config.height,
+                    frame_rate: config.frame_rate,
+                    bitrate_kbps: config.bitrate_kbps,
+                    codec,
+                    output_pipeline: pipeline.as_ptr(),
+                    entity_id: entity_id.as_ptr(),
+                    stream: config.stream,
+                    reserved_i32: [0; 8],
+                    reserved_ptr: [std::ptr::null_mut(); 4],
+                };
+
+                match unsafe { configure(&raw) } {
+                    $crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorOk => Ok(()),
+                    err => Err($crate::TextureStreamingError::from_raw(err)),
+                }
+            }
+
+            /// Requests a texture share start for the given `(entity_id, stream)` source.
+            ///
+            /// An empty `entity_id` targets the screen-buffer share; otherwise the
+            /// `(entity_id, stream)` pair resolves to a specific video capture
+            /// stream. The target must have been configured with
+            /// [`configure_texture_streaming`](Self::configure_texture_streaming) first.
+            ///
+            /// The start is asynchronous: `Ok(())` means the request was accepted,
+            /// not that the stream is running. Use
+            /// [`stop_texture_streaming`](Self::stop_texture_streaming) to stop.
+            ///
+            /// # Examples
+            /// ```no_run
+            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
+            /// api.start_texture_streaming("Vehicle@cam", 0).unwrap();
+            /// # }
+            /// ```
+            pub fn start_texture_streaming(
+                &self,
+                entity_id: &str,
+                stream: i32,
+            ) -> Result<(), $crate::TextureStreamingError> {
+                let start = match unsafe { (*self.inner).startTextureStreaming } {
+                    Some(start) => start,
+                    None => panic!(
+                        "This version of Oden is too old to have the start_texture_streaming function"
+                    ),
+                };
+
+                let entity_id = std::ffi::CString::new(entity_id.trim_end_matches('\0'))
+                    .map_err(|_| $crate::TextureStreamingError::OdenTextureStreamingErrorArgumentContainsNul)?;
+
+                match unsafe { start(entity_id.as_ptr(), stream) } {
+                    $crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorOk => Ok(()),
+                    err => Err($crate::TextureStreamingError::from_raw(err)),
+                }
+            }
+
+            /// Requests a stop of a texture share previously started with
+            /// [`start_texture_streaming`](Self::start_texture_streaming).
+            ///
+            /// The stop is asynchronous: `Ok(())` means the request was accepted.
+            ///
+            /// # Examples
+            /// ```no_run
+            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
+            /// api.stop_texture_streaming("Vehicle@cam", 0).unwrap();
+            /// # }
+            /// ```
+            pub fn stop_texture_streaming(
+                &self,
+                entity_id: &str,
+                stream: i32,
+            ) -> Result<(), $crate::TextureStreamingError> {
+                let stop = match unsafe { (*self.inner).stopTextureStreaming } {
+                    Some(stop) => stop,
+                    None => panic!(
+                        "This version of Oden is too old to have the stop_texture_streaming function"
+                    ),
+                };
+
+                let entity_id = std::ffi::CString::new(entity_id.trim_end_matches('\0'))
+                    .map_err(|_| $crate::TextureStreamingError::OdenTextureStreamingErrorArgumentContainsNul)?;
+
+                match unsafe { stop(entity_id.as_ptr(), stream) } {
+                    $crate::plugin_h::OdenTextureStreamingError_e_OdenTextureStreamingErrorOk => Ok(()),
+                    err => Err($crate::TextureStreamingError::from_raw(err)),
                 }
             }
 
