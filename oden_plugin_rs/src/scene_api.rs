@@ -1008,6 +1008,13 @@ pub trait SceneApi {
         stream: i32,
         show: bool,
     ) -> Result<(), SceneParamError>;
+    fn max_reorder_frames(&self, entity: &str, stream: i32) -> Result<i32, SceneParamError>;
+    fn set_max_reorder_frames(
+        &self,
+        entity: &str,
+        stream: i32,
+        max_reorder_frames: i32,
+    ) -> Result<(), SceneParamError>;
     fn entity_scale(&self, entity: &str) -> Result<Vec3, SceneParamError>;
     fn set_entity_scale(&self, entity: &str, scale: &Vec3) -> Result<(), SceneParamError>;
     fn raw_record_folder(&self) -> Result<String, SceneParamError>;
@@ -5656,6 +5663,7 @@ macro_rules! impl_scene_api {
                 }
             }
 
+            /// Returns the drop-detector timeout in milliseconds for a video stream.
             pub fn drop_detector_timeout(&self, entity: &str, stream: i32) -> Result<f32, $crate::SceneParamError> {
                 if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
                     let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
@@ -5678,6 +5686,7 @@ macro_rules! impl_scene_api {
                 }
             }
 
+            /// Sets the drop-detector timeout in milliseconds for a video stream.
             pub fn set_drop_detector_timeout(&self, entity: &str, stream: i32, timeout_ms: f32) -> Result<(), $crate::SceneParamError> {
                 if let Some(set_scene_param) = unsafe { (*self.inner).setSceneParam } {
                     let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
@@ -5700,6 +5709,7 @@ macro_rules! impl_scene_api {
                 }
             }
 
+            /// Returns whether Oden draws its no-signal screen for a video stream.
             pub fn show_no_signal_screen(&self, entity: &str, stream: i32) -> Result<bool, $crate::SceneParamError> {
                 if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
                     let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
@@ -5722,6 +5732,7 @@ macro_rules! impl_scene_api {
                 }
             }
 
+            /// Sets whether Oden draws its no-signal screen for a video stream.
             pub fn set_show_no_signal_screen(&self, entity: &str, stream: i32, show: bool) -> Result<(), $crate::SceneParamError> {
                 if let Some(set_scene_param) = unsafe { (*self.inner).setSceneParam } {
                     let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
@@ -5741,6 +5752,55 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the set_show_no_signal_screen function");
+                }
+            }
+
+            /// Returns the maximum number of frames the LLTP receiver waits for reordered packets.
+            pub fn max_reorder_frames(&self, entity: &str, stream: i32) -> Result<i32, $crate::SceneParamError> {
+                if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
+                    let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
+
+                    let mut param = $crate::plugin_h::OdenSceneParamMaxReorderFrames {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeMaxReorderFrames,
+                        next: std::ptr::null_mut(),
+                        entityId: entity_id.as_ptr(),
+                        streamIndex: stream,
+                        maxReorderFrames: 0,
+                    };
+
+                    let res = unsafe { get_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(param.maxReorderFrames),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the max_reorder_frames function");
+                }
+            }
+
+            /// Sets the maximum number of frames the LLTP receiver waits for reordered packets.
+            ///
+            /// `max_reorder_frames` must be from 1 through 1000. Changing it restarts an active LLTP
+            /// receiver; setting it to the existing value leaves the receiver running.
+            pub fn set_max_reorder_frames(&self, entity: &str, stream: i32, max_reorder_frames: i32) -> Result<(), $crate::SceneParamError> {
+                if let Some(set_scene_param) = unsafe { (*self.inner).setSceneParam } {
+                    let entity_id = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
+
+                    let mut param = $crate::plugin_h::OdenSceneParamMaxReorderFrames {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeMaxReorderFrames,
+                        next: std::ptr::null_mut(),
+                        entityId: entity_id.as_ptr(),
+                        streamIndex: stream,
+                        maxReorderFrames: max_reorder_frames,
+                    };
+
+                    let res = unsafe { set_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(()),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the set_max_reorder_frames function");
                 }
             }
 
