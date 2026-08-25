@@ -1,0 +1,7 @@
+# Default owners for Oden repo
+*                               @voysys/Voysys
+
+/SEC-SCS                        @voysys/security
+/CODEOWNERS                     @voysys/security
+/.github/workflows/security*    @voysys/security
+
