@@ -613,6 +613,17 @@ pub struct TextureStreamingConfig {
     pub stream: i32,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serialize", derive(serde::Serialize, serde::Deserialize))]
+pub struct StreamerLinkFeedbackStats {
+    pub network_device_name: String,
+    pub channel_usage: f32,
+    pub streamer_bitrate_mbps: f32,
+    pub estimated_mbps_for_link: f32,
+    pub feedback_age: std::time::Duration,
+    pub has_valid_feedback: bool,
+}
+
 #[allow(clippy::needless_lifetimes)]
 #[cfg_attr(feature = "mock", mockall::automock)]
 pub trait SceneApi {
@@ -678,6 +689,7 @@ pub trait SceneApi {
     fn stream_statistics_ex(&self, entity: &str) -> Option<Box<crate::StreamStatisticsEx>>;
     fn has_entity_with_name(&self, entity: &str) -> bool;
     fn streamer_bitrate_mbps(&self) -> Option<f32>;
+    fn streamer_link_feedback_stats(&self) -> Option<Vec<StreamerLinkFeedbackStats>>;
     fn set_streamer_max_bandwidth(&self, bitrate: f32) -> bool;
     fn link_count<'a>(&self, entity: Option<&'a str>) -> Result<i32, LinkError>;
     fn set_link_mode<'a>(
@@ -2096,6 +2108,53 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the streamer_bitrate_mbps function");
+                }
+            }
+
+            /// Gets per-link bandwidth feedback from the Streamer, with one entry
+            /// per configured Streamer link, or [`None`] if called in Player or if
+            /// the Streamer is inactive.
+            /// Example
+            /// ```no_run
+            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
+            /// if let Some(stats) = api.streamer_link_feedback_stats() {
+            ///     for link in &stats {
+            ///         // Do something with the per-link feedback
+            ///     }
+            /// }
+            /// # }
+            /// ```
+            pub fn streamer_link_feedback_stats(
+                &self,
+            ) -> Option<Vec<$crate::scene_api::StreamerLinkFeedbackStats>> {
+                if let Some(get_stats) = unsafe { (*self.inner).getStreamerLinkFeedbackStats } {
+                    let link_count = self.link_count(None).ok()?;
+                    let mut all_stats = Vec::with_capacity(link_count.max(0) as usize);
+
+                    for index in 0..link_count {
+                        let mut raw = $crate::plugin_h::OdenStreamerLinkFeedbackStats::default();
+                        if !unsafe { get_stats(index, &mut raw) } || raw.feedbackAgeNs < 0 {
+                            return None;
+                        }
+
+                        let network_device_name = unsafe {
+                            std::ffi::CStr::from_ptr(raw.networkDeviceName.as_ptr())
+                                .to_string_lossy()
+                                .into_owned()
+                        };
+                        all_stats.push($crate::scene_api::StreamerLinkFeedbackStats {
+                            network_device_name,
+                            channel_usage: raw.channelUsage,
+                            streamer_bitrate_mbps: raw.streamerBitrateMbps,
+                            estimated_mbps_for_link: raw.estimatedMbpsForLink,
+                            feedback_age: std::time::Duration::from_nanos(raw.feedbackAgeNs as u64),
+                            has_valid_feedback: raw.hasValidFeedback,
+                        });
+                    }
+
+                    Some(all_stats)
+                } else {
+                    panic!("This version of Oden is too old to have the streamer_link_feedback_stats function");
                 }
             }
 
