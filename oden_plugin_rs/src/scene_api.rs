@@ -1027,6 +1027,12 @@ pub trait SceneApi {
         stream: i32,
         max_reorder_frames: i32,
     ) -> Result<(), SceneParamError>;
+    fn regulator_max_packet_size(&self, mode: RegulatorMode) -> Result<i32, SceneParamError>;
+    fn set_regulator_max_packet_size(
+        &self,
+        mode: RegulatorMode,
+        max_packet_size: i32,
+    ) -> Result<(), SceneParamError>;
     fn entity_scale(&self, entity: &str) -> Result<Vec3, SceneParamError>;
     fn set_entity_scale(&self, entity: &str, scale: &Vec3) -> Result<(), SceneParamError>;
     fn raw_record_folder(&self) -> Result<String, SceneParamError>;
@@ -5860,6 +5866,73 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the set_max_reorder_frames function");
+                }
+            }
+
+            /// Returns the maximum packet size in bytes used by the bandwidth regulator in the given mode.
+            ///
+            /// `mode` must be `Low`, `Medium` or `High`. Only available in the streamer application.
+            ///
+            /// Example
+            /// ```no_run
+            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
+            ///     if let Ok(size) = api.regulator_max_packet_size(oden_plugin_rs::RegulatorMode::OdenRegulatorModeHigh) {
+            ///         log::info!("High mode max packet size is {size} bytes");
+            ///     }
+            /// # }
+            /// ```
+            pub fn regulator_max_packet_size(&self, mode: $crate::RegulatorMode) -> Result<i32, $crate::SceneParamError> {
+                if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
+                    let mut param = $crate::plugin_h::OdenSceneParamRegulatorMaxPacketSize {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeRegulatorMaxPacketSize,
+                        next: std::ptr::null_mut(),
+                        mode,
+                        maxPacketSize: 0,
+                    };
+
+                    let res = unsafe { get_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(param.maxPacketSize),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the regulator_max_packet_size function");
+                }
+            }
+
+            /// Sets the maximum packet size in bytes used by the bandwidth regulator in the given mode.
+            ///
+            /// `mode` must be `Low`, `Medium` or `High`. `max_packet_size` must be from 128 through
+            /// 2047. The new value applies from the next encoded frame. Note that the per-mode packet
+            /// size is only used while the bandwidth regulator is enabled, see
+            /// [`set_bandwidth_regulator_state`](Self::set_bandwidth_regulator_state); when it is
+            /// disabled the stream's own packet size setting is used instead.
+            /// Only available in the streamer application.
+            ///
+            /// Example
+            /// ```no_run
+            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
+            ///     if api.set_regulator_max_packet_size(oden_plugin_rs::RegulatorMode::OdenRegulatorModeLow, 512).is_ok() {
+            ///         log::info!("Low mode max packet size is now 512 bytes");
+            ///     }
+            /// # }
+            /// ```
+            pub fn set_regulator_max_packet_size(&self, mode: $crate::RegulatorMode, max_packet_size: i32) -> Result<(), $crate::SceneParamError> {
+                if let Some(set_scene_param) = unsafe { (*self.inner).setSceneParam } {
+                    let mut param = $crate::plugin_h::OdenSceneParamRegulatorMaxPacketSize {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeRegulatorMaxPacketSize,
+                        next: std::ptr::null_mut(),
+                        mode,
+                        maxPacketSize: max_packet_size,
+                    };
+
+                    let res = unsafe { set_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(()),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the set_regulator_max_packet_size function");
                 }
             }
 

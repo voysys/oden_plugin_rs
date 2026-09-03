@@ -1970,6 +1970,7 @@ pub enum OdenSceneParamType_e {
     OdenSceneParamTypeDropDetectorTimeout = 46,
     OdenSceneParamTypeShowNoSignalScreen = 47,
     OdenSceneParamTypeMaxReorderFrames = 48,
+    OdenSceneParamTypeRegulatorMaxPacketSize = 49,
     OdenSceneParamTypeMaxEnum = 2147483647,
 }
 pub use self::OdenSceneParamType_e as OdenSceneParamType;
@@ -2940,6 +2941,24 @@ impl Default for OdenSceneParamMaxReorderFrames_s {
     }
 }
 pub type OdenSceneParamMaxReorderFrames = OdenSceneParamMaxReorderFrames_s;
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct OdenSceneParamRegulatorMaxPacketSize_s {
+    pub type_: OdenSceneParamType,
+    pub next: *mut ::std::os::raw::c_void,
+    pub mode: OdenRegulatorMode,
+    pub maxPacketSize: i32,
+}
+impl Default for OdenSceneParamRegulatorMaxPacketSize_s {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type OdenSceneParamRegulatorMaxPacketSize = OdenSceneParamRegulatorMaxPacketSize_s;
 pub type OdenGetHorizonFunc = ::std::option::Option<
     unsafe extern "C" fn(entity: *const ::std::os::raw::c_char, horizon: *mut OdenVec3) -> bool,
 >;

@@ -451,6 +451,8 @@ mockall::mock! {
         fn set_show_no_signal_screen(&self, entity: &str, stream: i32, show: bool) -> Result<(), SceneParamError>;
         fn max_reorder_frames(&self, entity: &str, stream: i32) -> Result<i32, SceneParamError>;
         fn set_max_reorder_frames(&self, entity: &str, stream: i32, max_reorder_frames: i32) -> Result<(), SceneParamError>;
+        fn regulator_max_packet_size(&self, mode: RegulatorMode) -> Result<i32, SceneParamError>;
+        fn set_regulator_max_packet_size(&self, mode: RegulatorMode, max_packet_size: i32) -> Result<(), SceneParamError>;
         fn raw_record_folder(&self) -> Result<String, crate::SceneParamError>;
         fn set_raw_record_folder(&self, folder_path: &str) -> Result<(), crate::SceneParamError>;
         fn virtual_camera_render_only_uuids(
