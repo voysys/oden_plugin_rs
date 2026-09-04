@@ -3,7 +3,7 @@
 > Rust wrapper for the Oden plugin C API. Write Oden plugins in Rust against a
 > safe, idiomatic API.
 
-Latest release: 50.0.0
+Latest release: 51.0.0
 
 API methods live as inherent methods on the `*Params` structs (`InitParams`,
 `UpdateParams`, `GuiParams`, ...). Call them directly on the `api` value passed
@@ -17,7 +17,7 @@ importing them only yields unused-import warnings.
 oden_plugin_rs = { git = "https://github.com/voysys/oden_plugin_rs", branch = "master" }
 
 # Pinned to a release
-oden_plugin_rs = { git = "https://github.com/voysys/oden_plugin_rs", tag = "v50.0.0" }
+oden_plugin_rs = { git = "https://github.com/voysys/oden_plugin_rs", tag = "v51.0.0" }
 ```
 
 ## Hello world
