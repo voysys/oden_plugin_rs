@@ -691,7 +691,7 @@ dependencies = [
 
 [[package]]
 name = "oden_plugin_rs"
-version = "0.1.0"
+version = "51.0.0"
 dependencies = [
  "assert_into",
  "backtrace",
@@ -720,7 +720,7 @@ dependencies = [
 
 [[package]]
 name = "oden_plugin_rs-derive"
-version = "0.1.0"
+version = "51.0.0"
 dependencies = [
  "heck 0.4.1",
  "proc-macro2",
