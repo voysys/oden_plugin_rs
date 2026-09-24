@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["__mock_MockUpdateApi","__mock_MockUpdateApi_UpdateApi"],"struct":["MockUpdateApi","ScreenSpaceGuard"],"trait":["UpdateApi"]};
