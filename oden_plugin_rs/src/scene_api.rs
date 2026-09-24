@@ -466,7 +466,7 @@ where
     match res {
         LinkError::OdenLinkErrorOk => {
             if size > 0 {
-                // Resize to size + 1 because we need a '\0' for crate::utils::utf8_from_raw
+                // Resize to size + 1 because we need a ´\0´ for crate::utils::utf8_from_raw
                 buffer.resize(size as usize + 1, 0);
             } else {
                 buffer.clear()

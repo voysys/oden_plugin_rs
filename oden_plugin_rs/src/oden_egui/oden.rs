@@ -1,4 +1,4 @@
-use super::{painter, Painter};
+use super::{painter, shader_version, Painter};
 use crate::{
     log, plugin_h, DrawParams, InitAndGraphicsApi, UpdateParams, WindowEvent, PLUGIN_MOD_ALT,
     PLUGIN_MOD_CONTROL, PLUGIN_MOD_SHIFT, PLUGIN_MOD_SUPER,
@@ -6,6 +6,7 @@ use crate::{
 use egui::{
     vec2, Event, Key, Modifiers, PointerButton, Pos2, RawInput, Rect, ViewportIdMap, ViewportInfo,
 };
+use shader_version::ShaderVersion;
 use std::{mem, rc::Rc, time::Instant};
 
 pub struct OdenEgui {
@@ -29,7 +30,7 @@ impl OdenEgui {
             glow::Context::from_loader_function_cstr(move |s| oden_gl(s.as_ptr()))
         });
 
-        let painter = Painter::new(gl, "", None)
+        let painter = Painter::new(gl, "", Some(ShaderVersion::Gl140))
             .map_err(|error| {
                 log::error!("error occurred in initializing painter:\n{}", error);
             })
