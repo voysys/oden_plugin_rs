@@ -11,7 +11,7 @@ use crate::{
     update_api::UpdateApi,
     CalibrationQuality, CameraCalibration, CameraMetadata, CameraStreamState, GamepadState,
     ImDrawTextAlignment, KeyModifiers, LinkError, LinkMode, LinkStatsInterfaceStatistics,
-    MouseCursor, PlaybackTimes, RegulatorMode, SceneParamError, StreamStatistics,
+    MouseCursor, PlaybackTimes, RegulatorMode, SceneParamError, StreamPacketLoss, StreamStatistics,
     StreamerLinkFeedbackStats, TextureStreamingConfig, TextureStreamingError, ViewportInfo,
     WindowEvent, WindowMode,
 };
@@ -144,6 +144,7 @@ mockall::mock! {
         fn has_entity_with_name(&self, entity: &str) -> bool;
         fn streamer_bitrate_mbps(&self) -> Option<f32>;
         fn streamer_link_feedback_stats(&self) -> Option<Vec<StreamerLinkFeedbackStats>>;
+        fn stream_packet_loss(&self, entity: &str, stream: i32) -> Option<StreamPacketLoss>;
         fn set_streamer_max_bandwidth(&self, bitrate: f32) -> bool;
         fn link_count<'a>(&self, entity: Option<&'a str>) -> Result<i32, LinkError>;
         fn set_link_mode<'a>(

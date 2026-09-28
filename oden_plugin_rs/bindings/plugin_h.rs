@@ -1626,6 +1626,13 @@ impl Default for OdenStreamerLinkFeedbackStats_s {
 }
 pub type OdenStreamerLinkFeedbackStats = OdenStreamerLinkFeedbackStats_s;
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct OdenStreamPacketLoss_s {
+    pub totalPackets: i64,
+    pub totalLostPackets: i64,
+}
+pub type OdenStreamPacketLoss = OdenStreamPacketLoss_s;
+#[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct OdenStreamStatistics_s {
     pub frameEmitTime: i64,
@@ -3242,6 +3249,13 @@ pub type OdenGetStreamerBitrateMbpsFunc =
 pub type OdenGetStreamerLinkFeedbackStatsFunc = ::std::option::Option<
     unsafe extern "C" fn(linkIndex: i32, statsOut: *mut OdenStreamerLinkFeedbackStats) -> bool,
 >;
+pub type OdenGetStreamPacketLossFunc = ::std::option::Option<
+    unsafe extern "C" fn(
+        entity: *const ::std::os::raw::c_char,
+        stream: i32,
+        packetLossOut: *mut OdenStreamPacketLoss,
+    ) -> bool,
+>;
 pub type OdenStartStreamerFunc = ::std::option::Option<unsafe extern "C" fn()>;
 pub type OdenStopStreamerFunc = ::std::option::Option<unsafe extern "C" fn()>;
 pub type OdenConfigureTextureStreamingFunc = ::std::option::Option<
@@ -4466,7 +4480,8 @@ pub struct OdenPluginEntityUpdateParams_s {
     pub startTextureStreaming: OdenStartTextureStreamingFunc,
     pub stopTextureStreaming: OdenStopTextureStreamingFunc,
     pub getStreamerLinkFeedbackStats: OdenGetStreamerLinkFeedbackStatsFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 180usize],
+    pub getStreamPacketLoss: OdenGetStreamPacketLossFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 179usize],
     pub clearLinkEncryptionAllowedPublicKeys: OdenClearLinkEncryptionAllowedPublicKeysFunc,
     pub setLinkToRelayLink: OdenSetLinkToRelayLinkFunc,
     pub isLinkRelayLink: OdenIsLinkRelayLinkFunc,
@@ -4755,7 +4770,8 @@ pub struct OdenPluginEntityDrawParams_s {
     pub startTextureStreaming: OdenStartTextureStreamingFunc,
     pub stopTextureStreaming: OdenStopTextureStreamingFunc,
     pub getStreamerLinkFeedbackStats: OdenGetStreamerLinkFeedbackStatsFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 175usize],
+    pub getStreamPacketLoss: OdenGetStreamPacketLossFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 174usize],
     pub worldMatrix: OdenMatrix4,
     pub projMatrix: OdenMatrix4,
     pub viewportX: i32,
@@ -5058,7 +5074,8 @@ pub struct OdenPluginEntityGuiParams_s {
     pub startTextureStreaming: OdenStartTextureStreamingFunc,
     pub stopTextureStreaming: OdenStopTextureStreamingFunc,
     pub getStreamerLinkFeedbackStats: OdenGetStreamerLinkFeedbackStatsFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 200usize],
+    pub getStreamPacketLoss: OdenGetStreamPacketLossFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 199usize],
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
