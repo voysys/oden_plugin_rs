@@ -133,7 +133,7 @@ where
     }
 }
 
-/// Used by the `register!` macro to determine how to register the plugin with Oden
+/// Used by the ´register!´ macro to determine how to register the plugin with Oden
 pub enum RegisterType {
     /// Used to register an entity type that can be added to a scene
     Entity,
