@@ -17,11 +17,11 @@ export default function MultiCamLayout() {
       setLastIncoming({ payload });
     };
 
-    layoutClient.registerUserMessageCallback("test_message", incomingHandler);
+    layoutClient.registerUserMessageCallback("example_to_webview", incomingHandler);
 
     return () => {
       if (typeof layoutClient.unregisterUserMessageCallback === 'function') {
-        layoutClient.unregisterUserMessageCallback("test_message", incomingHandler);
+        layoutClient.unregisterUserMessageCallback("example_to_webview", incomingHandler);
       }
     };
   }, []);
@@ -29,10 +29,7 @@ export default function MultiCamLayout() {
   // Outbound test message
   const handleSendClick = () => {
     const layoutClient = getOrCreateOdenLayoutClient();
-    layoutClient.sendNamedUserMessage('ui:demoButton', {
-      clicked: true,
-      ts: Date.now(),
-    });
+    layoutClient.sendNamedUserMessage('example_from_webview', { ts: Date.now() });
   };
 
   return (
@@ -78,7 +75,7 @@ export default function MultiCamLayout() {
         onClick={handleSendClick}
         className="fixed bottom-4 right-4 z-50 rounded-2xl bg-blue-600 px-4 py-2 text-white shadow-lg hover:bg-blue-700 active:scale-95"
       >
-        Send Oden Message
+        Send example_from_webview
       </button>
 
       {/* Debug overlay */}

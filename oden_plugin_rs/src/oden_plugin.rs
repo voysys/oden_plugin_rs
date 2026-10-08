@@ -384,8 +384,9 @@ macro_rules! register {
                 )+
             }
 
-            if init_logger {
-                $crate::oden_log::init().expect("Failed to initialize logger, this is likely because the plugin was loaded twice. Check your plugin load paths.");
+            // No panic: with RTLD_NODELETE on Android a reloaded plugin registers again with its logger set.
+            if init_logger && $crate::oden_log::init().is_err() {
+                eprintln!("Plugin logger already set: this plugin is probably loaded twice. Check the plugin load paths.");
             }
 
             $crate::paste::paste! {
