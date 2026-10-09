@@ -17,11 +17,11 @@ as a client, subscribes to one downstream message, and sends one upstream messag
 
 Rust Plugin: `cargo build`
 
-React app: Go to `example_react` and run `npm install`.
+React app: Go to `../webview/example_react` and run `npm install`.
 
 ## Running
 
-- Go to `example_react` and run `npm run dev`.
+- Go to `../webview/example_react` and run `npm run dev`.
 - Copy the build artifact under `target/debug/` or `target/release` into the OdenVR
   directory.
-- Run OdenVR and point the WebView plugin at `http://localhost:8000`.
+- Run OdenVR and point the WebView plugin at `localhost:3000`.

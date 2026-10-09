@@ -3,26 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 8000",
+    "dev": "set PORT=8000 && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^16.3.6",
+    "next": "^16.3.0",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "baseline-browser-mapping": "^2.11.21",
+    "autoprefixer": "^10.0.1",
+    "baseline-browser-mapping": "^2.10.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "postcss": "^8",
-    "tailwindcss": "^4.3.3",
+    "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }
 }

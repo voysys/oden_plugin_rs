@@ -466,7 +466,7 @@ where
     match res {
         LinkError::OdenLinkErrorOk => {
             if size > 0 {
-                // Resize to size + 1 because we need a '\0' for crate::utils::utf8_from_raw
+                // Resize to size + 1 because we need a ´\0´ for crate::utils::utf8_from_raw
                 buffer.resize(size as usize + 1, 0);
             } else {
                 buffer.clear()
@@ -624,13 +624,6 @@ pub struct StreamerLinkFeedbackStats {
     pub has_valid_feedback: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "serialize", derive(serde::Serialize, serde::Deserialize))]
-pub struct StreamPacketLoss {
-    pub packets: i64,
-    pub lost_packets: i64,
-}
-
 #[allow(clippy::needless_lifetimes)]
 #[cfg_attr(feature = "mock", mockall::automock)]
 pub trait SceneApi {
@@ -697,7 +690,6 @@ pub trait SceneApi {
     fn has_entity_with_name(&self, entity: &str) -> bool;
     fn streamer_bitrate_mbps(&self) -> Option<f32>;
     fn streamer_link_feedback_stats(&self) -> Option<Vec<StreamerLinkFeedbackStats>>;
-    fn stream_packet_loss(&self, entity: &str, stream: i32) -> Option<StreamPacketLoss>;
     fn set_streamer_max_bandwidth(&self, bitrate: f32) -> bool;
     fn link_count<'a>(&self, entity: Option<&'a str>) -> Result<i32, LinkError>;
     fn set_link_mode<'a>(
@@ -2169,47 +2161,6 @@ macro_rules! impl_scene_api {
                     Some(all_stats)
                 } else {
                     panic!("This version of Oden is too old to have the streamer_link_feedback_stats function");
-                }
-            }
-
-            /// Returns running totals of packets and of packets that never arrived for a given
-            /// video stream. Unlike `lost_packets` in [`stream_statistics`](Self::stream_statistics),
-            /// lost packets here include those recovered by FEC.
-            ///
-            /// The totals only grow, so the loss rate over an interval is the difference between
-            /// two samples. A frame is counted once a newer frame has superseded it, so the totals
-            /// trail the live stream by a few frames. Frames of which no packet arrived are not
-            /// counted.
-            ///
-            /// Only works for `Remote Streamer` inputs, returns [`None`] otherwise.
-            ///
-            /// Example
-            /// ```no_run
-            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
-            /// if let Some(packet_loss) = api.stream_packet_loss("Remote Streamer", 1) {
-            ///     // Compare against an earlier sample to get the loss rate over that interval
-            /// }
-            /// # }
-            /// ```
-            pub fn stream_packet_loss(
-                &self,
-                entity: &str,
-                stream: i32,
-            ) -> Option<$crate::scene_api::StreamPacketLoss> {
-                if let Some(get_stream_packet_loss) = unsafe { (*self.inner).getStreamPacketLoss } {
-                    let entity = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
-                    let mut raw = $crate::plugin_h::OdenStreamPacketLoss::default();
-
-                    if unsafe { get_stream_packet_loss(entity.as_ptr(), stream, &mut raw) } {
-                        Some($crate::scene_api::StreamPacketLoss {
-                            packets: raw.totalPackets,
-                            lost_packets: raw.totalLostPackets,
-                        })
-                    } else {
-                        None
-                    }
-                } else {
-                    panic!("This version of Oden is too old to have the stream_packet_loss function");
                 }
             }
 

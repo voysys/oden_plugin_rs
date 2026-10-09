@@ -133,7 +133,7 @@ where
     }
 }
 
-/// Used by the `register!` macro to determine how to register the plugin with Oden
+/// Used by the ´register!´ macro to determine how to register the plugin with Oden
 pub enum RegisterType {
     /// Used to register an entity type that can be added to a scene
     Entity,
@@ -384,9 +384,8 @@ macro_rules! register {
                 )+
             }
 
-            // No panic: with RTLD_NODELETE on Android a reloaded plugin registers again with its logger set.
-            if init_logger && $crate::oden_log::init().is_err() {
-                eprintln!("Plugin logger already set: this plugin is probably loaded twice. Check the plugin load paths.");
+            if init_logger {
+                $crate::oden_log::init().expect("Failed to initialize logger, this is likely because the plugin was loaded twice. Check your plugin load paths.");
             }
 
             $crate::paste::paste! {
