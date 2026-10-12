@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["__mock_MockSettingsApi","__mock_MockSettingsApi_SettingsApi"],"struct":["MockSettingsApi"],"trait":["SettingsApi","SettingsExtApi"]};

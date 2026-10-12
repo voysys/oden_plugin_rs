@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["__mock_MockInitAndUpdateApi","__mock_MockInitAndUpdateApi_InitAndUpdateApi"],"struct":["FontDescriptor","MockInitAndUpdateApi"],"trait":["InitAndUpdateApi"]};

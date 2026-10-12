@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["__mock_MockImDrawApi","__mock_MockImDrawApi_ImDrawApi"],"struct":["MockImDrawApi"],"trait":["ImDrawApi"]};
