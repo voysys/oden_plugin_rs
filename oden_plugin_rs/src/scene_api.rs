@@ -914,7 +914,6 @@ pub trait SceneApi {
         stream: i32,
     ) -> Result<[crate::plugin_h::OdenDecodedFrame; 64usize], SceneParamError>;
     fn is_over_gui(&self) -> Result<bool, SceneParamError>;
-    fn is_gui_text_input(&self) -> Result<bool, SceneParamError>;
     fn close_project(&self);
     fn request_print_screen(&self);
     fn print_screen<'a>(&'a self) -> Result<PrintScreen<'a>, SceneParamError>;
@@ -4316,37 +4315,6 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the is_over_gui function");
-                }
-            }
-
-            /// Get if an Oden GUI text field holds the keyboard: it was active when the GUI was last drawn.
-            /// Always false while the GUI is hidden. An engine without this parameter returns an error,
-            /// so callers that forward keys elsewhere can use `unwrap_or(false)`.
-            ///
-            /// Example
-            /// ```no_run
-            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
-            ///     if !api.is_gui_text_input().unwrap_or(false) {
-            ///         log::info!("Keys are free for the plugin");
-            ///     }
-            /// # }
-            /// ```
-            pub fn is_gui_text_input(&self) -> Result<bool, $crate::SceneParamError> {
-                if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
-                    let mut param = $crate::plugin_h::OdenSceneParamGuiTextInput {
-                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeGuiTextInput,
-                        next: std::ptr::null_mut(),
-                        isActive: false,
-                    };
-
-                    let res = unsafe { get_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
-
-                    match res {
-                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(param.isActive),
-                        _ => Err(res),
-                    }
-                } else {
-                    panic!("This version of Oden is too old to have the is_gui_text_input function");
                 }
             }
 

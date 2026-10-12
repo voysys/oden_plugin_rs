@@ -361,7 +361,6 @@ mockall::mock! {
             stream: i32,
         ) -> Result<[crate::plugin_h::OdenDecodedFrame; 64usize], SceneParamError>;
         fn is_over_gui(&self) -> Result<bool, SceneParamError>;
-        fn is_gui_text_input(&self) -> Result<bool, SceneParamError>;
         fn close_project(&self);
         fn request_print_screen(&self);
         fn print_screen<'a>(&'a self) -> Result<PrintScreen<'a>, SceneParamError>;
