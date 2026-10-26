@@ -12,8 +12,7 @@ use egui::{
 };
 pub use glow::Context;
 use glow::HasContext as _;
-use memoffset::offset_of;
-use std::{collections::HashMap, rc::Rc};
+use std::{collections::HashMap, mem::offset_of, rc::Rc};
 
 const VERT_SRC: &str = include_str!("shader/vertex.glsl");
 const FRAG_SRC: &str = include_str!("shader/fragment.glsl");

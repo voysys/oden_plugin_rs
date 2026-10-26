@@ -16,7 +16,7 @@ glam_conversion = ["glam"]
 glam_nalgebra = ["glam_conversion", "nalgebra_conversion", "nalgebra/convert-glam024"]
 mock = ["mockall"]
 nalgebra_conversion = ["nalgebra"]
-oden_egui = ["egui", "bytemuck", "glow", "memoffset"]
+oden_egui = ["egui", "bytemuck", "glow"]
 serialize = ["serde", "base64", "ciborium", "glam/serde", "nalgebra/serde-serialize"]
 strum_ex = ["strum", "strum_macros"]
 webview_user_message = ["serde", "serde_json"]
@@ -34,7 +34,6 @@ glow = { version = "0.13", optional = true }
 inherent = "1"
 libc = "0.2"
 log = "0.4"
-memoffset = { version = "0.9", optional = true }
 mockall = { version = "0.11", optional = true }
 nalgebra = { version = "0.32", optional = true }
 paste = "1"
