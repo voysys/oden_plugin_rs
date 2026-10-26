@@ -1107,6 +1107,12 @@ pub trait SceneApi {
         index: i32,
         ignore: bool,
     ) -> Result<(), LinkError>;
+    fn set_link_allow_outgoing_feedback<'a>(
+        &self,
+        entity: Option<&'a str>,
+        index: i32,
+        allow: bool,
+    ) -> Result<(), LinkError>;
     fn remote_streamer_video_info(
         &self,
         remote_streamer_entity: &str,
@@ -6768,6 +6774,42 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the set_link_drop_outgoing_packets function");
+                }
+            }
+
+            /// Let feedback packets through on the link with `index` even when
+            /// [`set_link_drop_outgoing_packets`](scene_api_impl::set_link_drop_outgoing_packets)
+            /// drops its other outgoing traffic.
+            ///
+            /// Example
+            /// ```no_run
+            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
+            ///     let entity = None;
+            ///     let index = 0;
+            ///     api.set_link_allow_outgoing_feedback(entity, index, true);
+            /// # }
+            /// ```
+            pub fn set_link_allow_outgoing_feedback(
+                &self,
+                entity: Option<& str>,
+                index: i32,
+                allow: bool,
+            ) -> Result<(), $crate::LinkError> {
+                if let Some(set_link_allow_outgoing_feedback) = unsafe{(*self.inner).setLinkAllowOutgoingFeedback} {
+                    let res = match entity {
+                        Some(entity) => {
+                            let entity = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
+                            unsafe { set_link_allow_outgoing_feedback(entity.as_ptr(), index, allow) }
+                        }
+                        None => unsafe { set_link_allow_outgoing_feedback(std::ptr::null(), index, allow) },
+                    };
+
+                    match res {
+                        $crate::LinkError::OdenLinkErrorOk => Ok(()),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the set_link_allow_outgoing_feedback function");
                 }
             }
 

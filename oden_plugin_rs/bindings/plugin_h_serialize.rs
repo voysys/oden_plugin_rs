@@ -3469,6 +3469,13 @@ pub type OdenSetLinkDropOutgoingPackets = ::std::option::Option<
         drop: bool,
     ) -> OdenLinkError,
 >;
+pub type OdenSetLinkAllowOutgoingFeedbackFunc = ::std::option::Option<
+    unsafe extern "C" fn(
+        entityId: *const ::std::os::raw::c_char,
+        index: i32,
+        allow: bool,
+    ) -> OdenLinkError,
+>;
 pub type OdenGetLinkTimeSinceLastReceivedPacketNsFunc = ::std::option::Option<
     unsafe extern "C" fn(
         entityId: *const ::std::os::raw::c_char,
@@ -4502,7 +4509,8 @@ pub struct OdenPluginEntityUpdateParams_s {
     pub stopTextureStreaming: OdenStopTextureStreamingFunc,
     pub getStreamerLinkFeedbackStats: OdenGetStreamerLinkFeedbackStatsFunc,
     pub getStreamPacketLoss: OdenGetStreamPacketLossFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 179usize],
+    pub setLinkAllowOutgoingFeedback: OdenSetLinkAllowOutgoingFeedbackFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 178usize],
     pub clearLinkEncryptionAllowedPublicKeys: OdenClearLinkEncryptionAllowedPublicKeysFunc,
     pub setLinkToRelayLink: OdenSetLinkToRelayLinkFunc,
     pub isLinkRelayLink: OdenIsLinkRelayLinkFunc,
@@ -4792,7 +4800,8 @@ pub struct OdenPluginEntityDrawParams_s {
     pub stopTextureStreaming: OdenStopTextureStreamingFunc,
     pub getStreamerLinkFeedbackStats: OdenGetStreamerLinkFeedbackStatsFunc,
     pub getStreamPacketLoss: OdenGetStreamPacketLossFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 174usize],
+    pub setLinkAllowOutgoingFeedback: OdenSetLinkAllowOutgoingFeedbackFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 173usize],
     pub worldMatrix: OdenMatrix4,
     pub projMatrix: OdenMatrix4,
     pub viewportX: i32,
@@ -5096,7 +5105,8 @@ pub struct OdenPluginEntityGuiParams_s {
     pub stopTextureStreaming: OdenStopTextureStreamingFunc,
     pub getStreamerLinkFeedbackStats: OdenGetStreamerLinkFeedbackStatsFunc,
     pub getStreamPacketLoss: OdenGetStreamPacketLossFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 199usize],
+    pub setLinkAllowOutgoingFeedback: OdenSetLinkAllowOutgoingFeedbackFunc,
+    pub reserved: [*mut ::std::os::raw::c_void; 198usize],
 }
 #[repr(C)]
 #[derive(Copy, Clone)]

@@ -515,6 +515,12 @@ mockall::mock! {
             index: i32,
             ignore: bool,
         ) -> Result<(), LinkError>;
+        fn set_link_allow_outgoing_feedback<'a>(
+            &self,
+            entity: Option<&'a str>,
+            index: i32,
+            allow: bool,
+        ) -> Result<(), LinkError>;
         fn remote_streamer_video_info(
             &self,
             remote_streamer_entity: &str,
