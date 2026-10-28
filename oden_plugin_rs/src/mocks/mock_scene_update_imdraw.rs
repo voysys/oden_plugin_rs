@@ -9,11 +9,11 @@ use crate::{
     scene_api::{JoystickState, LinkP2PStatus, PrintScreen, RigidBody, RigidBodyUuid},
     update_api::ScreenSpaceGuard,
     update_api::UpdateApi,
-    CalibrationQuality, CameraCalibration, CameraMetadata, CameraStreamState, GamepadState,
-    ImDrawTextAlignment, KeyModifiers, LinkError, LinkMode, LinkStatsInterfaceStatistics,
-    MouseCursor, PlaybackTimes, RegulatorMode, SceneParamError, StreamPacketLoss, StreamStatistics,
-    StreamerLinkFeedbackStats, TextureStreamingConfig, TextureStreamingError, ViewportInfo,
-    WindowEvent, WindowMode,
+    AudioLinkState, CalibrationQuality, CameraCalibration, CameraMetadata, CameraStreamState,
+    GamepadState, ImDrawTextAlignment, KeyModifiers, LinkError, LinkMode,
+    LinkStatsInterfaceStatistics, MouseCursor, PlaybackTimes, RegulatorMode, SceneParamError,
+    StreamPacketLoss, StreamStatistics, StreamerLinkFeedbackStats, TextureStreamingConfig,
+    TextureStreamingError, ViewportInfo, WindowEvent, WindowMode,
 };
 
 use std::{ops::RangeInclusive, sync::mpsc::Receiver};
@@ -544,6 +544,7 @@ mockall::mock! {
             remote_streamer: Option<&'a str>,
             volume: f32,
         ) -> Result<(), SceneParamError>;
+        fn audio_link_state(&self, remote_streamer: &str) -> Result<AudioLinkState, SceneParamError>;
         fn link_bind_device<'a>(
             &self,
             entity: Option<&'a str>,

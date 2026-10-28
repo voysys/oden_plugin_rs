@@ -416,7 +416,7 @@ pub use plugin_h::{
 pub use plugin_h::{PLUGIN_MOD_ALT, PLUGIN_MOD_CONTROL, PLUGIN_MOD_SHIFT, PLUGIN_MOD_SUPER};
 
 pub use scene_api::{
-    CalibrationQuality, GamepadAxis, GamepadButton, JoystickState, KeyModifiers,
+    AudioLinkState, CalibrationQuality, GamepadAxis, GamepadButton, JoystickState, KeyModifiers,
     PerformanceMetrics, PlaybackTimes, QueryError, SceneApi, SceneApiExt, StreamPacketLoss,
     StreamerLinkFeedbackStats, TextureStreamingCodec, TextureStreamingConfig,
     TextureStreamingError,

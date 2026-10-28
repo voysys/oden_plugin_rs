@@ -160,6 +160,14 @@ pub struct PlaybackTimes {
     pub current: f64,
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct AudioLinkState {
+    pub receiving: bool,
+    pub sending: bool,
+    pub receive_requested: bool,
+    pub send_requested: bool,
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 pub struct KeyModifiers {
     pub mod_alt: bool,
@@ -1136,6 +1144,7 @@ pub trait SceneApi {
         remote_streamer: Option<&'a str>,
         volume: f32,
     ) -> Result<(), SceneParamError>;
+    fn audio_link_state(&self, remote_streamer: &str) -> Result<AudioLinkState, SceneParamError>;
     fn link_bind_device<'a>(
         &self,
         entity: Option<&'a str>,
@@ -7248,6 +7257,49 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the audio_output_volume function");
+                }
+            }
+
+            /// Returns whether a Remote Streamer is receiving audio from and sending audio to its peer.
+            ///
+            /// `receiving` and `sending` turn true once the audio device has opened. `receive_requested`
+            /// and `send_requested` are true from the start request (by a plugin, the GUI or the
+            /// project's auto start) until stop, so a link still opening its device reports requested
+            /// but not active.
+            ///
+            /// Example
+            /// ```no_run
+            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
+            ///     let state = api.audio_link_state("Remote Streamer Id").unwrap();
+            ///     log::info!("receiving: {} sending: {}", state.receiving, state.sending);
+            /// # }
+            /// ```
+            pub fn audio_link_state(&self, remote_streamer: &str) -> Result<$crate::AudioLinkState, $crate::SceneParamError> {
+                if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
+                    let remote_streamer = std::ffi::CString::new(remote_streamer.trim_end_matches('\0')).unwrap();
+                    let mut param = $crate::plugin_h::OdenSceneParamAudioLinkState {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeAudioLinkState,
+                        next: std::ptr::null_mut(),
+                        remoteStreamerId: remote_streamer.as_ptr(),
+                        receiving: false,
+                        sending: false,
+                        receiveRequested: false,
+                        sendRequested: false,
+                    };
+
+                    let res = unsafe { get_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok($crate::AudioLinkState {
+                            receiving: param.receiving,
+                            sending: param.sending,
+                            receive_requested: param.receiveRequested,
+                            send_requested: param.sendRequested,
+                        }),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the audio_link_state function");
                 }
             }
 

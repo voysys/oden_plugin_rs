@@ -1978,6 +1978,7 @@ pub enum OdenSceneParamType_e {
     OdenSceneParamTypeMaxReorderFrames = 48,
     OdenSceneParamTypeRegulatorMaxPacketSize = 49,
     OdenSceneParamTypeGuiTextInput = 50,
+    OdenSceneParamTypeAudioLinkState = 51,
     OdenSceneParamTypeMaxEnum = 2147483647,
 }
 pub use self::OdenSceneParamType_e as OdenSceneParamType;
@@ -2983,6 +2984,27 @@ impl Default for OdenSceneParamGuiTextInput_s {
     }
 }
 pub type OdenSceneParamGuiTextInput = OdenSceneParamGuiTextInput_s;
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct OdenSceneParamAudioLinkState_s {
+    pub type_: OdenSceneParamType,
+    pub next: *mut ::std::os::raw::c_void,
+    pub remoteStreamerId: *const ::std::os::raw::c_char,
+    pub receiving: bool,
+    pub sending: bool,
+    pub receiveRequested: bool,
+    pub sendRequested: bool,
+}
+impl Default for OdenSceneParamAudioLinkState_s {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type OdenSceneParamAudioLinkState = OdenSceneParamAudioLinkState_s;
 pub type OdenGetHorizonFunc = ::std::option::Option<
     unsafe extern "C" fn(entity: *const ::std::os::raw::c_char, horizon: *mut OdenVec3) -> bool,
 >;
