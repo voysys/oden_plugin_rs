@@ -168,6 +168,14 @@ pub struct AudioLinkState {
     pub send_requested: bool,
 }
 
+#[derive(Clone, Debug)]
+pub struct NetworkLog {
+    pub enable: bool,
+    pub directory: String,
+    pub max_size_mb: i32,
+    pub rotate_minutes: i32,
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 pub struct KeyModifiers {
     pub mod_alt: bool,
@@ -1050,6 +1058,7 @@ pub trait SceneApi {
         mode: RegulatorMode,
         max_packet_size: i32,
     ) -> Result<(), SceneParamError>;
+    fn set_network_log(&self, network_log: &NetworkLog) -> Result<(), SceneParamError>;
     fn entity_scale(&self, entity: &str) -> Result<Vec3, SceneParamError>;
     fn set_entity_scale(&self, entity: &str, scale: &Vec3) -> Result<(), SceneParamError>;
     fn raw_record_folder(&self) -> Result<String, SceneParamError>;
@@ -6029,6 +6038,49 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the set_regulator_max_packet_size function");
+                }
+            }
+
+            /// Starts, changes or stops the network log, with the settings of `network_log` in oden.conf.
+            ///
+            /// An empty directory means `network` in Oden's settings directory, and `rotate_minutes` 0
+            /// rotates by size only. The settings replace oden.conf's until Oden exits and are never saved.
+            ///
+            /// Example
+            /// ```no_run
+            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
+            ///     let network_log = oden_plugin_rs::NetworkLog {
+            ///         enable: true,
+            ///         directory: "/var/log/oden-network".to_owned(),
+            ///         max_size_mb: 512,
+            ///         rotate_minutes: 10,
+            ///     };
+            ///     if let Err(error) = api.set_network_log(&network_log) {
+            ///         log::error!("Failed to set the network log: {error}");
+            ///     }
+            /// # }
+            /// ```
+            pub fn set_network_log(&self, network_log: &$crate::scene_api::NetworkLog) -> Result<(), $crate::SceneParamError> {
+                if let Some(set_scene_param) = unsafe { (*self.inner).setSceneParam } {
+                    let directory = std::ffi::CString::new(network_log.directory.as_str())
+                        .map_err(|_| $crate::SceneParamError::OdenSceneParamErrorInvalidValue)?;
+
+                    let mut param = $crate::plugin_h::OdenSceneParamNetworkLog {
+                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeNetworkLog,
+                        next: std::ptr::null_mut(),
+                        enable: network_log.enable,
+                        maxSizeMb: network_log.max_size_mb,
+                        rotateMinutes: network_log.rotate_minutes,
+                        directory: directory.as_ptr(),
+                    };
+
+                    let res = unsafe { set_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
+                    match res {
+                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(()),
+                        _ => Err(res),
+                    }
+                } else {
+                    panic!("This version of Oden is too old to have the set_network_log function");
                 }
             }
 

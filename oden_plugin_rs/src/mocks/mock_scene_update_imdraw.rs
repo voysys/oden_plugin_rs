@@ -6,7 +6,7 @@ use crate::{
         OdenMonitorInfo, OdenRay, OdenRayToVideoIntersect,
     },
     scene_api::SceneApi,
-    scene_api::{JoystickState, LinkP2PStatus, PrintScreen, RigidBody, RigidBodyUuid},
+    scene_api::{JoystickState, LinkP2PStatus, NetworkLog, PrintScreen, RigidBody, RigidBodyUuid},
     update_api::ScreenSpaceGuard,
     update_api::UpdateApi,
     AudioLinkState, CalibrationQuality, CameraCalibration, CameraMetadata, CameraStreamState,
@@ -455,6 +455,7 @@ mockall::mock! {
         fn set_max_reorder_frames(&self, entity: &str, stream: i32, max_reorder_frames: i32) -> Result<(), SceneParamError>;
         fn regulator_max_packet_size(&self, mode: RegulatorMode) -> Result<i32, SceneParamError>;
         fn set_regulator_max_packet_size(&self, mode: RegulatorMode, max_packet_size: i32) -> Result<(), SceneParamError>;
+        fn set_network_log(&self, network_log: &NetworkLog) -> Result<(), SceneParamError>;
         fn raw_record_folder(&self) -> Result<String, crate::SceneParamError>;
         fn set_raw_record_folder(&self, folder_path: &str) -> Result<(), crate::SceneParamError>;
         fn virtual_camera_render_only_uuids(
