@@ -4,19 +4,16 @@
 #![allow(missing_docs)]
 
 use crate::{
-    plugin_h::OdenPluginGlobalFunctions, AsyncComChannelMessageId, AsyncComChannelReceiveError,
-    AsyncComChannelVarSizeMsgId, ODEN_GLOBAL,
+    oden_global, AsyncComChannelMessageId, AsyncComChannelReceiveError, AsyncComChannelVarSizeMsgId,
 };
 use assert_into::AssertInto;
 use std::{ffi::CString, mem, time::Duration};
 use zerocopy::{AsBytes, FromBytes};
 
 pub fn async_com_channel_add_message_to_send_queue(message_id: &str, data: &impl AsBytes) {
-    if unsafe { ODEN_GLOBAL.is_null() } {
+    let Some(globals) = oden_global() else {
         return;
-    }
-
-    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
+    };
 
     let c_message_id = CString::new(message_id).unwrap();
 
@@ -36,11 +33,9 @@ pub fn async_com_channel_add_message_to_send_queue(message_id: &str, data: &impl
 }
 
 pub fn async_com_channel_add_message_to_send_queue_raw(message_id: &str, data: &[u8]) {
-    if unsafe { ODEN_GLOBAL.is_null() } {
+    let Some(globals) = oden_global() else {
         return;
-    }
-
-    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
+    };
 
     let c_message_id = CString::new(message_id).unwrap();
 
@@ -58,11 +53,9 @@ pub fn async_com_channel_add_message_to_send_queue_raw(message_id: &str, data: &
 }
 
 pub fn async_com_channel_flush_message_queue() {
-    if unsafe { ODEN_GLOBAL.is_null() } {
+    let Some(globals) = oden_global() else {
         return;
-    }
-
-    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
+    };
 
     if let Some(async_com_channel_flush_message_queue) = globals.asyncComChannelFlushMessageQueue {
         unsafe { async_com_channel_flush_message_queue() };
@@ -75,11 +68,9 @@ pub fn async_com_channel_receive_var_size(
     buffer: &mut [u8],
     timeout: Duration,
 ) -> Result<(i32, usize), AsyncComChannelReceiveError> {
-    if unsafe { ODEN_GLOBAL.is_null() } {
+    let Some(globals) = oden_global() else {
         return Err(AsyncComChannelReceiveError::OdenAsyncComChannelReceiveErrorUnknown);
-    }
-
-    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
+    };
 
     if let Some(async_com_channel_receive_var_size_msg) = globals.asyncComChannelReceiveVarSizeMsg {
         let mut c_message_ids_strs: Vec<CString> = Vec::new();
@@ -147,11 +138,9 @@ macro_rules! impl_async_com_channel_receive {
                         $t: FromBytes + AsBytes + Default,
                     )*
                 {
-                    if unsafe { ODEN_GLOBAL.is_null() } {
+                    let Some(globals) = oden_global() else {
                         return Err(AsyncComChannelReceiveError::OdenAsyncComChannelReceiveErrorUnknown);
-                    }
-
-                    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
+                    };
 
                     if let Some(async_com_channel_receive) = globals.asyncComChannelReceive {
                         let mut c_message_ids_strs: Vec<CString> = Vec::new();

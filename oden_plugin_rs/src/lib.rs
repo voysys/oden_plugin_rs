@@ -196,6 +196,8 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
+use std::sync::atomic::{AtomicPtr, Ordering};
+
 #[rustfmt::skip]
 #[doc(hidden)]
 pub mod plugin_h;
@@ -446,8 +448,21 @@ pub use paste;
 #[doc(hidden)]
 pub use backtrace;
 
+static ODEN_GLOBAL: AtomicPtr<plugin_h::OdenPluginGlobalFunctions> =
+    AtomicPtr::new(std::ptr::null_mut());
+
+/// # Safety
+/// `global` must be null or point to an `OdenPluginGlobalFunctions` that stays valid
+/// for as long as any thread may call into this crate.
 #[doc(hidden)]
-pub static mut ODEN_GLOBAL: *mut plugin_h::OdenPluginGlobalFunctions = std::ptr::null_mut();
+pub unsafe fn set_oden_global(global: *mut plugin_h::OdenPluginGlobalFunctions) {
+    ODEN_GLOBAL.store(global, Ordering::Release);
+}
+
+#[doc(hidden)]
+pub fn oden_global() -> Option<&'static plugin_h::OdenPluginGlobalFunctions> {
+    unsafe { ODEN_GLOBAL.load(Ordering::Acquire).as_ref() }
+}
 
 #[cfg(feature = "mock")]
 pub use mocks::*;

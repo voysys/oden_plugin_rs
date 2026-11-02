@@ -371,7 +371,7 @@ macro_rules! register {
             }));
 
             unsafe {
-                $crate::ODEN_GLOBAL = global;
+                $crate::set_oden_global(global);
             }
 
             let mut init_logger = true;
