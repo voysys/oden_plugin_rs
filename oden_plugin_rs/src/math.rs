@@ -1,9 +1,8 @@
 #![allow(missing_docs)]
 
 use crate::{
-    oden_global,
     plugin_h::{self, OdenRay},
-    CameraCalibration,
+    CameraCalibration, ODEN_GLOBAL,
 };
 use std::{error::Error, fmt::Display, str::FromStr};
 
@@ -16,9 +15,6 @@ pub use plugin_h::{
     OdenMatrix4_s as Matrix4, OdenQuat_s as Quat, OdenRay_s as Ray, OdenUuid_s as Uuid,
     OdenVec2_s as Vec2, OdenVec2i_s as Vec2i, OdenVec3_s as Vec3, OdenVec4_s as Vec4,
 };
-
-const NOT_LOADED_BY_ODEN: &str =
-    "Oden math functions are only available in a plugin loaded by Oden";
 
 impl Vec2 {
     pub const fn xy(x: f32, y: f32) -> Self {
@@ -372,7 +368,8 @@ pub fn project_camera(
     pixel_coords: Vec2,
 ) -> Option<OdenRay> {
     unsafe {
-        if let Some(project_camera) = oden_global().expect(NOT_LOADED_BY_ODEN).projectCamera {
+        assert!(!ODEN_GLOBAL.is_null());
+        if let Some(project_camera) = (*ODEN_GLOBAL).projectCamera {
             return Some(project_camera(
                 calibration,
                 image_width,
@@ -385,10 +382,8 @@ pub fn project_camera(
 }
 pub fn closest_point_between_rays(ray1: Ray, ray2: Ray) -> Option<Vec3> {
     unsafe {
-        if let Some(closest_point_between_rays) = oden_global()
-            .expect(NOT_LOADED_BY_ODEN)
-            .closestPointBetweenRays
-        {
+        assert!(!ODEN_GLOBAL.is_null());
+        if let Some(closest_point_between_rays) = (*ODEN_GLOBAL).closestPointBetweenRays {
             let mut vec = Vec3::default();
             closest_point_between_rays(ray1, ray2, &mut vec as *mut _);
             return Some(vec);
@@ -398,7 +393,8 @@ pub fn closest_point_between_rays(ray1: Ray, ray2: Ray) -> Option<Vec3> {
 }
 pub fn mult_matrix(a: Matrix4, b: Matrix4) -> Option<Matrix4> {
     unsafe {
-        if let Some(mult_matrix) = oden_global().expect(NOT_LOADED_BY_ODEN).multMatrix {
+        assert!(!ODEN_GLOBAL.is_null());
+        if let Some(mult_matrix) = (*ODEN_GLOBAL).multMatrix {
             let mut mat = Matrix4::default();
             mult_matrix(a, b, &mut mat as *mut _);
             return Some(mat);
@@ -408,7 +404,8 @@ pub fn mult_matrix(a: Matrix4, b: Matrix4) -> Option<Matrix4> {
 }
 pub fn get_rotation_xyz(mat: Matrix4) -> Option<Vec3> {
     unsafe {
-        if let Some(get_rotation_xyz) = oden_global().expect(NOT_LOADED_BY_ODEN).getRotationXyz {
+        assert!(!ODEN_GLOBAL.is_null());
+        if let Some(get_rotation_xyz) = (*ODEN_GLOBAL).getRotationXyz {
             return Some(get_rotation_xyz(mat));
         }
     }
