@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["HAND_FLAG_ACTIVE","HAND_FLAG_LEFT","HAND_FLAG_LOCAL","HAND_FLAG_RIGHT"],"enum":["PowerState"],"fn":["add_gamepad_mapping","gamepad","gamepad_state","get_power_info","hand_tracking_state","is_joystick_present","joystick_state"],"struct":["Gamepad","HandTrackingState"]};
