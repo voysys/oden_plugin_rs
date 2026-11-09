@@ -1,9 +1,9 @@
-use crate::oden_global;
-use crate::plugin_h::OdenLogLevel;
+use crate::plugin_h::{self, OdenLogLevel};
 use crate::plugin_h::{
     OdenLogLevel_e_OdenLogDebug, OdenLogLevel_e_OdenLogError, OdenLogLevel_e_OdenLogInfo,
     OdenLogLevel_e_OdenLogTrace, OdenLogLevel_e_OdenLogWarning,
 };
+use crate::ODEN_GLOBAL;
 use log::{Level, Record};
 use std::ffi::CString;
 
@@ -70,9 +70,10 @@ pub fn init() -> Result<(), log::SetLoggerError> {
 }
 
 pub fn log(level: OdenLogLevel, file: &str, line: i32, module: &str, message: &str) {
-    let Some(globals) = oden_global() else {
+    if unsafe { ODEN_GLOBAL.is_null() } {
         return;
-    };
+    }
+    let globals: &plugin_h::OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
 
     let c_file = CString::new(file.trim_end_matches('\0')).unwrap_or_else(|_| {
         CString::new("Invalid log file, file name has internal null bytes").unwrap()
