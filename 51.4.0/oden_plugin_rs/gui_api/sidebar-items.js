@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["__mock_MockGuiApi","__mock_MockGuiApi_GuiApi"],"struct":["IndentGuard","MockGuiApi","TreeNodeGuard"],"trait":["GuiApi"]};
