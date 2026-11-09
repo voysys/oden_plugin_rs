@@ -11,6 +11,190 @@ use crate::{
 #[cfg(feature = "glam_conversion")]
 use glam;
 
+pub use crate::plugin_h::{
+    ODEN_JOYSTICK_POSE_AXIS, ODEN_JOYSTICK_POSE_CALIBRATED, ODEN_JOYSTICK_POSE_FLAGS_AXIS,
+    ODEN_JOYSTICK_POSE_ORIENTATION, ODEN_JOYSTICK_POSE_POSITION, ODEN_JOYSTICK_POSE_RELATIVE_YAW,
+    ODEN_JOYSTICK_POSE_VALID, ODEN_JOYSTICK_REFERENCE_AXIS,
+};
+
+impl JoystickState {
+    /// Optional capability/status bits stored in axis 96 by pose-aware producers.
+    /// Older VR backends omit this channel; `None` means unknown capabilities.
+    pub fn pose_flags(&self) -> Option<u32> {
+        let flags = *self.axes.get(ODEN_JOYSTICK_POSE_FLAGS_AXIS as usize)?;
+        if !flags.is_finite() || flags < 0.0 || flags > 16_777_215.0 || flags.fract() != 0.0 {
+            return None;
+        }
+        Some(flags as u32)
+    }
+
+    /// Controller-to-tracking-space pose from the existing VR joystick channels.
+    /// Returns `None` for absent, stale or malformed matrices. Orientation-only
+    /// input has zero translation; this does not mean its position was tracked.
+    /// Check `pose_flags()` for capabilities. Legacy VR poses lack those flags.
+    /// No headset/reference transform is applied automatically.
+    pub fn pose(&self) -> Option<math::Matrix4> {
+        if self.axes.len() > ODEN_JOYSTICK_POSE_FLAGS_AXIS as usize {
+            let flags = self.pose_flags()?;
+            if flags & ODEN_JOYSTICK_POSE_VALID == 0 || flags & ODEN_JOYSTICK_POSE_ORIENTATION == 0
+            {
+                return None;
+            }
+        }
+        self.pose_matrix_at(ODEN_JOYSTICK_POSE_AXIS as usize)
+    }
+
+    /// Backend-specific headset/reference matrix (axes 80..95).
+    /// Orientation-only SDL input supplies identity. VR semantics are unchanged.
+    pub fn pose_reference(&self) -> Option<math::Matrix4> {
+        self.pose_matrix_at(ODEN_JOYSTICK_REFERENCE_AXIS as usize)
+    }
+
+    fn pose_matrix_at(&self, start: usize) -> Option<math::Matrix4> {
+        let d: [f32; 16] = self.axes.get(start..start + 16)?.try_into().ok()?;
+        if !d.iter().all(|v| v.is_finite())
+            || [d[3], d[7], d[11], d[15] - 1.0]
+                .iter()
+                .any(|v| v.abs() > 0.001)
+        {
+            return None;
+        }
+        for a in 0..3 {
+            for b in a..3 {
+                let dot: f32 = (0..3).map(|r| d[a * 4 + r] * d[b * 4 + r]).sum();
+                let expected = if a == b { 1.0 } else { 0.0 };
+                if (dot - expected).abs() > 0.01 {
+                    return None;
+                }
+            }
+        }
+        let determinant = d[0] * (d[5] * d[10] - d[6] * d[9]) - d[4] * (d[1] * d[10] - d[2] * d[9])
+            + d[8] * (d[1] * d[6] - d[2] * d[5]);
+        if (determinant - 1.0).abs() > 0.01 {
+            return None;
+        }
+        Some(math::Matrix4 {
+            d: std::array::from_fn(|c| std::array::from_fn(|r| d[c * 4 + r])),
+        })
+    }
+}
+
+#[cfg(test)]
+mod joystick_pose_tests {
+    use super::*;
+
+    fn legacy_pose() -> JoystickState {
+        let mut state = JoystickState::default();
+        state.axes.resize(96, 0.0);
+        for i in 0..4 {
+            state.axes[64 + 5 * i] = 1.0;
+            state.axes[80 + 5 * i] = 1.0;
+        }
+        state.axes[76] = 2.0;
+        state
+    }
+
+    #[test]
+    fn legacy_vr_pose_keeps_translation_and_unknown_capabilities() {
+        let state = legacy_pose();
+        assert_eq!(state.pose().unwrap().d[3][0], 2.0);
+        assert_eq!(state.pose_flags(), None);
+        assert_eq!(state.pose_reference().unwrap().d[3][3], 1.0);
+    }
+
+    #[test]
+    fn orientation_only_pose_requires_fresh_data() {
+        let mut state = legacy_pose();
+        state.axes[76] = 0.0;
+        let flags = ODEN_JOYSTICK_POSE_ORIENTATION | ODEN_JOYSTICK_POSE_RELATIVE_YAW;
+        state.axes.push(flags as f32);
+        assert!(state.pose().is_none());
+        state.axes[96] = (flags | ODEN_JOYSTICK_POSE_VALID) as f32;
+        assert!(state.pose().is_some());
+        assert_eq!(state.pose_flags().unwrap() & ODEN_JOYSTICK_POSE_POSITION, 0);
+    }
+
+    #[test]
+    fn missing_zero_nan_and_nonrigid_poses_are_rejected() {
+        assert!(JoystickState::default().pose().is_none());
+        let mut state = legacy_pose();
+        state.axes[64] = f32::NAN;
+        assert!(state.pose().is_none());
+        state.axes[64] = 2.0;
+        assert!(state.pose().is_none());
+        state.axes.fill(0.0);
+        assert!(state.pose().is_none());
+    }
+
+    #[test]
+    fn invalid_status_and_each_nonfinite_matrix_element_are_rejected() {
+        for flags in [
+            -1.0,
+            0.5,
+            f32::NAN,
+            f32::INFINITY,
+            16_777_216.0,
+            0.0,
+            4.0,
+            1.0,
+        ] {
+            let mut state = legacy_pose();
+            state.axes.push(flags);
+            assert!(state.pose().is_none(), "invalid flags {flags}");
+        }
+        for offset in 0..16 {
+            for bad in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+                let mut state = legacy_pose();
+                state.axes[64 + offset] = bad;
+                assert!(state.pose().is_none());
+            }
+        }
+        let mut state = legacy_pose();
+        state.axes[64] = -1.0;
+        assert!(state.pose().is_none(), "A reflection is not a rotation");
+        state.axes[64] = 1.0;
+        state.axes[67] = 0.1;
+        assert!(state.pose().is_none(), "A perspective matrix is not a pose");
+    }
+
+    #[test]
+    fn truncated_and_random_channels_do_not_panic_or_decode_as_poses() {
+        let mut seed = 12345u32;
+        for length in 0..=128 {
+            for _ in 0..100 {
+                let mut state = JoystickState::default();
+                for _ in 0..length {
+                    seed = seed.wrapping_mul(1664525).wrapping_add(1013904223);
+                    state.axes.push(f32::from_bits(seed));
+                }
+                assert!(state.pose().is_none());
+                assert!(state.pose_reference().is_none());
+                let _ = state.pose_flags();
+            }
+        }
+    }
+
+    #[test]
+    fn valid_rotations_and_future_status_bits_preserve_column_order() {
+        for i in 0..1000 {
+            let angle = i as f32 * 0.01;
+            let (s, c) = angle.sin_cos();
+            let mut state = legacy_pose();
+            state.axes[64] = c;
+            state.axes[66] = -s;
+            state.axes[72] = s;
+            state.axes[74] = c;
+            state
+                .axes
+                .push((ODEN_JOYSTICK_POSE_ORIENTATION | ODEN_JOYSTICK_POSE_VALID | 1024) as f32);
+            let pose = state.pose().unwrap();
+            assert_eq!(pose.d[0][2], -s);
+            assert_eq!(pose.d[2][0], s);
+            assert_eq!(pose.d[3][0], 2.0);
+        }
+    }
+}
+
 /// Check if a joystick with the given id is present.
 ///
 /// This function can be called from any thread at any time.
@@ -59,6 +243,38 @@ pub fn joystick_state(joystick_id: i32) -> Option<JoystickState> {
         }
     } else {
         panic!("This version of Oden is too old to have the joystick_state function");
+    }
+}
+
+/// Turn gyroscope and accelerometer input on or off for the joystick with the given id.
+///
+/// Motion input is off by default. While it is on, a gamepad with a gyroscope and an
+/// accelerometer appends six raw IMU axes after its touchpad channels and publishes its
+/// orientation in the pose channels, see [`JoystickState::pose`]. The setting belongs to
+/// the joystick id: it stays until it is turned off, also across reconnects, and other
+/// plugins share it. Returns `false` if the id is out of range or this Oden build has no
+/// gamepad motion support.
+///
+/// This function can be called from any thread at any time.
+///
+/// # Examples
+/// ```no_run
+/// use oden_plugin_rs::input_api::{joystick_state, set_joystick_motion_enabled};
+///
+/// set_joystick_motion_enabled(0, true);
+/// if let Some(pose) = joystick_state(0).and_then(|state| state.pose()) {
+///     // Use pose
+/// }
+/// ```
+pub fn set_joystick_motion_enabled(joystick_id: i32, enabled: bool) -> bool {
+    let Some(globals) = oden_global() else {
+        return false;
+    };
+
+    if let Some(func) = globals.setJoystickMotionEnabled {
+        unsafe { func(joystick_id, enabled) }
+    } else {
+        panic!("This version of Oden is too old to have the set_joystick_motion_enabled function");
     }
 }
 
