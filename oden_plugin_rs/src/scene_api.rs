@@ -4623,8 +4623,12 @@ macro_rules! impl_scene_api {
                 }
             }
 
-            /// Returns the interface statistics for a certain link. If the link has not gotten any traffic
-            /// in over a second it will return the error OdenLinkErrorLinkHasNotGottenTraffic
+            /// Returns receive-side statistics for a link of a Remote Streamer entity in Player,
+            /// such as source address and per-frame packet loss.
+            ///
+            /// Only available in Player. In Oden Streamer it always returns
+            /// `OdenLinkErrorNoTrafficOnLink`. It also returns that error if the link
+            /// has not received any video in over a second.
             /// Example
             /// ```no_run
             /// # fn example(api: &(impl oden_plugin_rs::SceneApi + oden_plugin_rs::GuiApi)) {
