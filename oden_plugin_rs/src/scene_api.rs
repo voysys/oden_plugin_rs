@@ -160,22 +160,6 @@ pub struct PlaybackTimes {
     pub current: f64,
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub struct AudioLinkState {
-    pub receiving: bool,
-    pub sending: bool,
-    pub receive_requested: bool,
-    pub send_requested: bool,
-}
-
-#[derive(Clone, Debug)]
-pub struct NetworkLog {
-    pub enable: bool,
-    pub directory: String,
-    pub max_size_mb: i32,
-    pub rotate_minutes: i32,
-}
-
 #[derive(Debug, Clone, Copy, Default)]
 pub struct KeyModifiers {
     pub mod_alt: bool,
@@ -482,7 +466,7 @@ where
     match res {
         LinkError::OdenLinkErrorOk => {
             if size > 0 {
-                // Resize to size + 1 because we need a '\0' for crate::utils::utf8_from_raw
+                // Resize to size + 1 because we need a ´\0´ for crate::utils::utf8_from_raw
                 buffer.resize(size as usize + 1, 0);
             } else {
                 buffer.clear()
@@ -640,13 +624,6 @@ pub struct StreamerLinkFeedbackStats {
     pub has_valid_feedback: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "serialize", derive(serde::Serialize, serde::Deserialize))]
-pub struct StreamPacketLoss {
-    pub packets: i64,
-    pub lost_packets: i64,
-}
-
 #[allow(clippy::needless_lifetimes)]
 #[cfg_attr(feature = "mock", mockall::automock)]
 pub trait SceneApi {
@@ -713,7 +690,6 @@ pub trait SceneApi {
     fn has_entity_with_name(&self, entity: &str) -> bool;
     fn streamer_bitrate_mbps(&self) -> Option<f32>;
     fn streamer_link_feedback_stats(&self) -> Option<Vec<StreamerLinkFeedbackStats>>;
-    fn stream_packet_loss(&self, entity: &str, stream: i32) -> Option<StreamPacketLoss>;
     fn set_streamer_max_bandwidth(&self, bitrate: f32) -> bool;
     fn link_count<'a>(&self, entity: Option<&'a str>) -> Result<i32, LinkError>;
     fn set_link_mode<'a>(
@@ -930,7 +906,6 @@ pub trait SceneApi {
         stream: i32,
     ) -> Result<[crate::plugin_h::OdenDecodedFrame; 64usize], SceneParamError>;
     fn is_over_gui(&self) -> Result<bool, SceneParamError>;
-    fn is_gui_text_input(&self) -> Result<bool, SceneParamError>;
     fn close_project(&self);
     fn request_print_screen(&self);
     fn print_screen<'a>(&'a self) -> Result<PrintScreen<'a>, SceneParamError>;
@@ -1058,7 +1033,6 @@ pub trait SceneApi {
         mode: RegulatorMode,
         max_packet_size: i32,
     ) -> Result<(), SceneParamError>;
-    fn set_network_log(&self, network_log: &NetworkLog) -> Result<(), SceneParamError>;
     fn entity_scale(&self, entity: &str) -> Result<Vec3, SceneParamError>;
     fn set_entity_scale(&self, entity: &str, scale: &Vec3) -> Result<(), SceneParamError>;
     fn raw_record_folder(&self) -> Result<String, SceneParamError>;
@@ -1124,12 +1098,6 @@ pub trait SceneApi {
         index: i32,
         ignore: bool,
     ) -> Result<(), LinkError>;
-    fn set_link_allow_outgoing_feedback<'a>(
-        &self,
-        entity: Option<&'a str>,
-        index: i32,
-        allow: bool,
-    ) -> Result<(), LinkError>;
     fn remote_streamer_video_info(
         &self,
         remote_streamer_entity: &str,
@@ -1153,7 +1121,6 @@ pub trait SceneApi {
         remote_streamer: Option<&'a str>,
         volume: f32,
     ) -> Result<(), SceneParamError>;
-    fn audio_link_state(&self, remote_streamer: &str) -> Result<AudioLinkState, SceneParamError>;
     fn link_bind_device<'a>(
         &self,
         entity: Option<&'a str>,
@@ -2194,47 +2161,6 @@ macro_rules! impl_scene_api {
                     Some(all_stats)
                 } else {
                     panic!("This version of Oden is too old to have the streamer_link_feedback_stats function");
-                }
-            }
-
-            /// Returns running totals of packets and of packets that never arrived for a given
-            /// video stream. Unlike `lost_packets` in [`stream_statistics`](Self::stream_statistics),
-            /// lost packets here include those recovered by FEC.
-            ///
-            /// The totals only grow, so the loss rate over an interval is the difference between
-            /// two samples. A frame is counted once a newer frame has superseded it, so the totals
-            /// trail the live stream by a few frames. Frames of which no packet arrived are not
-            /// counted.
-            ///
-            /// Only works for `Remote Streamer` inputs, returns [`None`] otherwise.
-            ///
-            /// Example
-            /// ```no_run
-            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
-            /// if let Some(packet_loss) = api.stream_packet_loss("Remote Streamer", 1) {
-            ///     // Compare against an earlier sample to get the loss rate over that interval
-            /// }
-            /// # }
-            /// ```
-            pub fn stream_packet_loss(
-                &self,
-                entity: &str,
-                stream: i32,
-            ) -> Option<$crate::scene_api::StreamPacketLoss> {
-                if let Some(get_stream_packet_loss) = unsafe { (*self.inner).getStreamPacketLoss } {
-                    let entity = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
-                    let mut raw = $crate::plugin_h::OdenStreamPacketLoss::default();
-
-                    if unsafe { get_stream_packet_loss(entity.as_ptr(), stream, &mut raw) } {
-                        Some($crate::scene_api::StreamPacketLoss {
-                            packets: raw.totalPackets,
-                            lost_packets: raw.totalLostPackets,
-                        })
-                    } else {
-                        None
-                    }
-                } else {
-                    panic!("This version of Oden is too old to have the stream_packet_loss function");
                 }
             }
 
@@ -4343,37 +4269,6 @@ macro_rules! impl_scene_api {
                 }
             }
 
-            /// Get if an Oden GUI text field holds the keyboard: it was active when the GUI was last drawn.
-            /// Always false while the GUI is hidden. An engine without this parameter returns an error,
-            /// so callers that forward keys elsewhere can use `unwrap_or(false)`.
-            ///
-            /// Example
-            /// ```no_run
-            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
-            ///     if !api.is_gui_text_input().unwrap_or(false) {
-            ///         log::info!("Keys are free for the plugin");
-            ///     }
-            /// # }
-            /// ```
-            pub fn is_gui_text_input(&self) -> Result<bool, $crate::SceneParamError> {
-                if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
-                    let mut param = $crate::plugin_h::OdenSceneParamGuiTextInput {
-                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeGuiTextInput,
-                        next: std::ptr::null_mut(),
-                        isActive: false,
-                    };
-
-                    let res = unsafe { get_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
-
-                    match res {
-                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(param.isActive),
-                        _ => Err(res),
-                    }
-                } else {
-                    panic!("This version of Oden is too old to have the is_gui_text_input function");
-                }
-            }
-
             /// Closes the current project
             ///
             /// Example
@@ -6041,49 +5936,6 @@ macro_rules! impl_scene_api {
                 }
             }
 
-            /// Starts, changes or stops the network log, with the settings of `network_log` in oden.conf.
-            ///
-            /// An empty directory means `network` in Oden's settings directory, and `rotate_minutes` 0
-            /// rotates by size only. The settings replace oden.conf's until Oden exits and are never saved.
-            ///
-            /// Example
-            /// ```no_run
-            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
-            ///     let network_log = oden_plugin_rs::NetworkLog {
-            ///         enable: true,
-            ///         directory: "/var/log/oden-network".to_owned(),
-            ///         max_size_mb: 512,
-            ///         rotate_minutes: 10,
-            ///     };
-            ///     if let Err(error) = api.set_network_log(&network_log) {
-            ///         log::error!("Failed to set the network log: {error}");
-            ///     }
-            /// # }
-            /// ```
-            pub fn set_network_log(&self, network_log: &$crate::scene_api::NetworkLog) -> Result<(), $crate::SceneParamError> {
-                if let Some(set_scene_param) = unsafe { (*self.inner).setSceneParam } {
-                    let directory = std::ffi::CString::new(network_log.directory.as_str())
-                        .map_err(|_| $crate::SceneParamError::OdenSceneParamErrorInvalidValue)?;
-
-                    let mut param = $crate::plugin_h::OdenSceneParamNetworkLog {
-                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeNetworkLog,
-                        next: std::ptr::null_mut(),
-                        enable: network_log.enable,
-                        maxSizeMb: network_log.max_size_mb,
-                        rotateMinutes: network_log.rotate_minutes,
-                        directory: directory.as_ptr(),
-                    };
-
-                    let res = unsafe { set_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
-                    match res {
-                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok(()),
-                        _ => Err(res),
-                    }
-                } else {
-                    panic!("This version of Oden is too old to have the set_network_log function");
-                }
-            }
-
             /// Get the scale of an entity
             ///
             /// Returns the current scale (x, y, z) of the specified entity
@@ -6838,42 +6690,6 @@ macro_rules! impl_scene_api {
                 }
             }
 
-            /// Let feedback packets through on the link with `index` even when
-            /// [`set_link_drop_outgoing_packets`](scene_api_impl::set_link_drop_outgoing_packets)
-            /// drops its other outgoing traffic.
-            ///
-            /// Example
-            /// ```no_run
-            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
-            ///     let entity = None;
-            ///     let index = 0;
-            ///     api.set_link_allow_outgoing_feedback(entity, index, true);
-            /// # }
-            /// ```
-            pub fn set_link_allow_outgoing_feedback(
-                &self,
-                entity: Option<& str>,
-                index: i32,
-                allow: bool,
-            ) -> Result<(), $crate::LinkError> {
-                if let Some(set_link_allow_outgoing_feedback) = unsafe{(*self.inner).setLinkAllowOutgoingFeedback} {
-                    let res = match entity {
-                        Some(entity) => {
-                            let entity = std::ffi::CString::new(entity.trim_end_matches('\0')).unwrap();
-                            unsafe { set_link_allow_outgoing_feedback(entity.as_ptr(), index, allow) }
-                        }
-                        None => unsafe { set_link_allow_outgoing_feedback(std::ptr::null(), index, allow) },
-                    };
-
-                    match res {
-                        $crate::LinkError::OdenLinkErrorOk => Ok(()),
-                        _ => Err(res),
-                    }
-                } else {
-                    panic!("This version of Oden is too old to have the set_link_allow_outgoing_feedback function");
-                }
-            }
-
             /// Get video info for the given remote streamer entity
             ///
             /// Example
@@ -7309,49 +7125,6 @@ macro_rules! impl_scene_api {
                     }
                 } else {
                     panic!("This version of Oden is too old to have the audio_output_volume function");
-                }
-            }
-
-            /// Returns whether a Remote Streamer is receiving audio from and sending audio to its peer.
-            ///
-            /// `receiving` and `sending` turn true once the audio device has opened. `receive_requested`
-            /// and `send_requested` are true from the start request (by a plugin, the GUI or the
-            /// project's auto start) until stop, so a link still opening its device reports requested
-            /// but not active.
-            ///
-            /// Example
-            /// ```no_run
-            /// # fn example(api: &impl oden_plugin_rs::SceneApi) {
-            ///     let state = api.audio_link_state("Remote Streamer Id").unwrap();
-            ///     log::info!("receiving: {} sending: {}", state.receiving, state.sending);
-            /// # }
-            /// ```
-            pub fn audio_link_state(&self, remote_streamer: &str) -> Result<$crate::AudioLinkState, $crate::SceneParamError> {
-                if let Some(get_scene_param) = unsafe { (*self.inner).getSceneParam } {
-                    let remote_streamer = std::ffi::CString::new(remote_streamer.trim_end_matches('\0')).unwrap();
-                    let mut param = $crate::plugin_h::OdenSceneParamAudioLinkState {
-                        type_: $crate::plugin_h::OdenSceneParamType::OdenSceneParamTypeAudioLinkState,
-                        next: std::ptr::null_mut(),
-                        remoteStreamerId: remote_streamer.as_ptr(),
-                        receiving: false,
-                        sending: false,
-                        receiveRequested: false,
-                        sendRequested: false,
-                    };
-
-                    let res = unsafe { get_scene_param(&mut param as *mut _ as *mut std::os::raw::c_void) };
-
-                    match res {
-                        $crate::SceneParamError::OdenSceneParamErrorOk => Ok($crate::AudioLinkState {
-                            receiving: param.receiving,
-                            sending: param.sending,
-                            receive_requested: param.receiveRequested,
-                            send_requested: param.sendRequested,
-                        }),
-                        _ => Err(res),
-                    }
-                } else {
-                    panic!("This version of Oden is too old to have the audio_link_state function");
                 }
             }
 

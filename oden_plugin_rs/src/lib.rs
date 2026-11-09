@@ -196,8 +196,6 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
-use std::sync::atomic::{AtomicPtr, Ordering};
-
 #[rustfmt::skip]
 #[doc(hidden)]
 pub mod plugin_h;
@@ -403,13 +401,13 @@ pub use plugin_h::{
     PLUGIN_KEY_UP as KEY_UP, PLUGIN_KEY_V as KEY_V, PLUGIN_KEY_W as KEY_W,
     PLUGIN_KEY_WORLD_1 as KEY_WORLD_1, PLUGIN_KEY_WORLD_2 as KEY_WORLD_2, PLUGIN_KEY_X as KEY_X,
     PLUGIN_KEY_Y as KEY_Y, PLUGIN_KEY_Z as KEY_Z, PLUGIN_MOD_ALT as MOD_ALT,
-    PLUGIN_MOD_CONTROL as MOD_CONTROL, PLUGIN_MOD_FROM_TOUCH as MOD_FROM_TOUCH,
-    PLUGIN_MOD_SHIFT as MOD_SHIFT, PLUGIN_MOD_SUPER as MOD_SUPER,
-    PLUGIN_MOUSE_BUTTON_1 as MOUSE_BUTTON_1, PLUGIN_MOUSE_BUTTON_2 as MOUSE_BUTTON_2,
-    PLUGIN_MOUSE_BUTTON_3 as MOUSE_BUTTON_3, PLUGIN_MOUSE_BUTTON_4 as MOUSE_BUTTON_4,
-    PLUGIN_MOUSE_BUTTON_5 as MOUSE_BUTTON_5, PLUGIN_MOUSE_BUTTON_6 as MOUSE_BUTTON_6,
-    PLUGIN_MOUSE_BUTTON_7 as MOUSE_BUTTON_7, PLUGIN_MOUSE_BUTTON_8 as MOUSE_BUTTON_8,
-    PLUGIN_MOUSE_BUTTON_LAST as MOUSE_BUTTON_LAST, PLUGIN_MOUSE_BUTTON_LEFT as MOUSE_BUTTON_LEFT,
+    PLUGIN_MOD_CONTROL as MOD_CONTROL, PLUGIN_MOD_SHIFT as MOD_SHIFT,
+    PLUGIN_MOD_SUPER as MOD_SUPER, PLUGIN_MOUSE_BUTTON_1 as MOUSE_BUTTON_1,
+    PLUGIN_MOUSE_BUTTON_2 as MOUSE_BUTTON_2, PLUGIN_MOUSE_BUTTON_3 as MOUSE_BUTTON_3,
+    PLUGIN_MOUSE_BUTTON_4 as MOUSE_BUTTON_4, PLUGIN_MOUSE_BUTTON_5 as MOUSE_BUTTON_5,
+    PLUGIN_MOUSE_BUTTON_6 as MOUSE_BUTTON_6, PLUGIN_MOUSE_BUTTON_7 as MOUSE_BUTTON_7,
+    PLUGIN_MOUSE_BUTTON_8 as MOUSE_BUTTON_8, PLUGIN_MOUSE_BUTTON_LAST as MOUSE_BUTTON_LAST,
+    PLUGIN_MOUSE_BUTTON_LEFT as MOUSE_BUTTON_LEFT,
     PLUGIN_MOUSE_BUTTON_MIDDLE as MOUSE_BUTTON_MIDDLE,
     PLUGIN_MOUSE_BUTTON_RIGHT as MOUSE_BUTTON_RIGHT,
     PLUGIN_TENSOR_SHAPE_MAX_DIMS as ODEN_TENSOR_SHAPE_MAX_DIMS,
@@ -418,9 +416,9 @@ pub use plugin_h::{
 pub use plugin_h::{PLUGIN_MOD_ALT, PLUGIN_MOD_CONTROL, PLUGIN_MOD_SHIFT, PLUGIN_MOD_SUPER};
 
 pub use scene_api::{
-    AudioLinkState, CalibrationQuality, GamepadAxis, GamepadButton, JoystickState, KeyModifiers,
-    NetworkLog, PerformanceMetrics, PlaybackTimes, QueryError, SceneApi, SceneApiExt,
-    StreamPacketLoss, StreamerLinkFeedbackStats, TextureStreamingCodec, TextureStreamingConfig,
+    CalibrationQuality, GamepadAxis, GamepadButton, JoystickState, KeyModifiers,
+    PerformanceMetrics, PlaybackTimes, QueryError, SceneApi, SceneApiExt,
+    StreamerLinkFeedbackStats, TextureStreamingCodec, TextureStreamingConfig,
     TextureStreamingError,
 };
 pub use settings_api::SettingsApi;
@@ -448,21 +446,8 @@ pub use paste;
 #[doc(hidden)]
 pub use backtrace;
 
-static ODEN_GLOBAL: AtomicPtr<plugin_h::OdenPluginGlobalFunctions> =
-    AtomicPtr::new(std::ptr::null_mut());
-
-/// # Safety
-/// `global` must be null or point to an `OdenPluginGlobalFunctions` that stays valid
-/// for as long as any thread may call into this crate.
 #[doc(hidden)]
-pub unsafe fn set_oden_global(global: *mut plugin_h::OdenPluginGlobalFunctions) {
-    ODEN_GLOBAL.store(global, Ordering::Release);
-}
-
-#[doc(hidden)]
-pub fn oden_global() -> Option<&'static plugin_h::OdenPluginGlobalFunctions> {
-    unsafe { ODEN_GLOBAL.load(Ordering::Acquire).as_ref() }
-}
+pub static mut ODEN_GLOBAL: *mut plugin_h::OdenPluginGlobalFunctions = std::ptr::null_mut();
 
 #[cfg(feature = "mock")]
 pub use mocks::*;

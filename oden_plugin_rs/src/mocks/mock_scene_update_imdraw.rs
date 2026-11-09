@@ -6,14 +6,14 @@ use crate::{
         OdenMonitorInfo, OdenRay, OdenRayToVideoIntersect,
     },
     scene_api::SceneApi,
-    scene_api::{JoystickState, LinkP2PStatus, NetworkLog, PrintScreen, RigidBody, RigidBodyUuid},
+    scene_api::{JoystickState, LinkP2PStatus, PrintScreen, RigidBody, RigidBodyUuid},
     update_api::ScreenSpaceGuard,
     update_api::UpdateApi,
-    AudioLinkState, CalibrationQuality, CameraCalibration, CameraMetadata, CameraStreamState,
-    GamepadState, ImDrawTextAlignment, KeyModifiers, LinkError, LinkMode,
-    LinkStatsInterfaceStatistics, MouseCursor, PlaybackTimes, RegulatorMode, SceneParamError,
-    StreamPacketLoss, StreamStatistics, StreamerLinkFeedbackStats, TextureStreamingConfig,
-    TextureStreamingError, ViewportInfo, WindowEvent, WindowMode,
+    CalibrationQuality, CameraCalibration, CameraMetadata, CameraStreamState, GamepadState,
+    ImDrawTextAlignment, KeyModifiers, LinkError, LinkMode, LinkStatsInterfaceStatistics,
+    MouseCursor, PlaybackTimes, RegulatorMode, SceneParamError, StreamStatistics,
+    StreamerLinkFeedbackStats, TextureStreamingConfig, TextureStreamingError, ViewportInfo,
+    WindowEvent, WindowMode,
 };
 
 use std::{ops::RangeInclusive, sync::mpsc::Receiver};
@@ -144,7 +144,6 @@ mockall::mock! {
         fn has_entity_with_name(&self, entity: &str) -> bool;
         fn streamer_bitrate_mbps(&self) -> Option<f32>;
         fn streamer_link_feedback_stats(&self) -> Option<Vec<StreamerLinkFeedbackStats>>;
-        fn stream_packet_loss(&self, entity: &str, stream: i32) -> Option<StreamPacketLoss>;
         fn set_streamer_max_bandwidth(&self, bitrate: f32) -> bool;
         fn link_count<'a>(&self, entity: Option<&'a str>) -> Result<i32, LinkError>;
         fn set_link_mode<'a>(
@@ -361,7 +360,6 @@ mockall::mock! {
             stream: i32,
         ) -> Result<[crate::plugin_h::OdenDecodedFrame; 64usize], SceneParamError>;
         fn is_over_gui(&self) -> Result<bool, SceneParamError>;
-        fn is_gui_text_input(&self) -> Result<bool, SceneParamError>;
         fn close_project(&self);
         fn request_print_screen(&self);
         fn print_screen<'a>(&'a self) -> Result<PrintScreen<'a>, SceneParamError>;
@@ -455,7 +453,6 @@ mockall::mock! {
         fn set_max_reorder_frames(&self, entity: &str, stream: i32, max_reorder_frames: i32) -> Result<(), SceneParamError>;
         fn regulator_max_packet_size(&self, mode: RegulatorMode) -> Result<i32, SceneParamError>;
         fn set_regulator_max_packet_size(&self, mode: RegulatorMode, max_packet_size: i32) -> Result<(), SceneParamError>;
-        fn set_network_log(&self, network_log: &NetworkLog) -> Result<(), SceneParamError>;
         fn raw_record_folder(&self) -> Result<String, crate::SceneParamError>;
         fn set_raw_record_folder(&self, folder_path: &str) -> Result<(), crate::SceneParamError>;
         fn virtual_camera_render_only_uuids(
@@ -516,12 +513,6 @@ mockall::mock! {
             index: i32,
             ignore: bool,
         ) -> Result<(), LinkError>;
-        fn set_link_allow_outgoing_feedback<'a>(
-            &self,
-            entity: Option<&'a str>,
-            index: i32,
-            allow: bool,
-        ) -> Result<(), LinkError>;
         fn remote_streamer_video_info(
             &self,
             remote_streamer_entity: &str,
@@ -545,7 +536,6 @@ mockall::mock! {
             remote_streamer: Option<&'a str>,
             volume: f32,
         ) -> Result<(), SceneParamError>;
-        fn audio_link_state(&self, remote_streamer: &str) -> Result<AudioLinkState, SceneParamError>;
         fn link_bind_device<'a>(
             &self,
             entity: Option<&'a str>,

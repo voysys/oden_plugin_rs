@@ -12,7 +12,8 @@ use egui::{
 };
 pub use glow::Context;
 use glow::HasContext as _;
-use std::{collections::HashMap, mem::offset_of, rc::Rc};
+use memoffset::offset_of;
+use std::{collections::HashMap, rc::Rc};
 
 const VERT_SRC: &str = include_str!("shader/vertex.glsl");
 const FRAG_SRC: &str = include_str!("shader/fragment.glsl");
@@ -257,6 +258,11 @@ impl Painter {
             glow::ONE_MINUS_DST_ALPHA,
             glow::ONE,
         );
+
+        if !cfg!(target_arch = "wasm32") {
+            self.gl.disable(glow::FRAMEBUFFER_SRGB);
+            check_for_gl_error!(&self.gl, "FRAMEBUFFER_SRGB");
+        }
 
         let width_in_points = width_in_pixels as f32 / pixels_per_point;
         let height_in_points = height_in_pixels as f32 / pixels_per_point;

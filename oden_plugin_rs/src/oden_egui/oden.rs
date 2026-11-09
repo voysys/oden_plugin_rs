@@ -1,6 +1,4 @@
-use super::{painter, Painter};
-#[cfg(target_os = "android")]
-use crate::TouchInputAction;
+use super::{painter, shader_version, Painter};
 use crate::{
     log, plugin_h, DrawParams, InitAndGraphicsApi, UpdateParams, WindowEvent, PLUGIN_MOD_ALT,
     PLUGIN_MOD_CONTROL, PLUGIN_MOD_SHIFT, PLUGIN_MOD_SUPER,
@@ -8,6 +6,7 @@ use crate::{
 use egui::{
     vec2, Event, Key, Modifiers, PointerButton, Pos2, RawInput, Rect, ViewportIdMap, ViewportInfo,
 };
+use shader_version::ShaderVersion;
 use std::{mem, rc::Rc, time::Instant};
 
 pub struct OdenEgui {
@@ -18,9 +17,8 @@ pub struct OdenEgui {
     textures_delta: egui::TexturesDelta,
     pixels_per_point: f32,
     last_mouse_pos: Pos2,
-    pointer_gone_pending: bool,
     time: Instant,
-    draw_trim_y_px: i32,
+    gui_visible: bool,
     was_updated: bool,
 }
 
@@ -32,7 +30,7 @@ impl OdenEgui {
             glow::Context::from_loader_function_cstr(move |s| oden_gl(s.as_ptr()))
         });
 
-        let painter = Painter::new(gl, "", None)
+        let painter = Painter::new(gl, "", Some(ShaderVersion::Gl140))
             .map_err(|error| {
                 log::error!("error occurred in initializing painter:\n{}", error);
             })
@@ -47,9 +45,8 @@ impl OdenEgui {
             textures_delta: Default::default(),
             pixels_per_point: Default::default(),
             last_mouse_pos: Pos2::default(),
-            pointer_gone_pending: false,
             time: Instant::now(),
-            draw_trim_y_px: 0,
+            gui_visible: true,
             was_updated: false,
         })
     }
@@ -68,66 +65,45 @@ impl OdenEgui {
 
         let mouse_over_gui = api.is_over_gui().unwrap_or(false);
 
-        let scale = (viewport.content_scale.x(), viewport.content_scale.y());
-        let origin = (
-            viewport.origin_x_px as f32 / scale.0,
-            viewport.origin_y_px as f32 / scale.1,
-        );
-        let size = (
-            viewport.width_px as f32 / scale.0,
-            viewport.height_px as f32 / scale.1,
-        );
-
-        let inset = if viewport.origin_x_px > 0 || viewport.origin_y_px > 0 {
-            origin
-        } else if api.gui_visible() {
+        let offset = if api.gui_visible() {
+            self.gui_visible = true;
             (400.0, 24.0)
         } else {
+            self.gui_visible = false;
             (0.0, 0.0)
         };
 
-        self.draw_trim_y_px = if viewport.origin_x_px > 0 || viewport.origin_y_px > 0 {
-            viewport.origin_y_px
-        } else {
-            (inset.1 * scale.1).round() as i32
-        };
-
         let screen_rect = Rect::from_min_max(
-            Pos2::new(inset.0, 0.0),
-            Pos2::new(origin.0 + size.0, origin.1 + size.1 - inset.1),
+            Pos2::new(0.0 + offset.0, 0.0),
+            Pos2::new(
+                (viewport.width_px as f32 / viewport.content_scale.x()) + offset.0,
+                (viewport.height_px as f32 / viewport.content_scale.y()) + offset.1,
+            ),
         );
 
         let raw_input = if !mouse_over_gui {
-            let egui_offset = vec2(0.0, -inset.1);
-
             let mouse_pos = api.mouse_pos();
 
-            let mouse_pos = Pos2::new(
-                origin.0 + mouse_pos.x() * size.0,
-                origin.1 + mouse_pos.y() * size.1,
-            ) + egui_offset;
+            let mouse_pos = Pos2 {
+                x: mouse_pos.x() * viewport.width_px as f32 / viewport.content_scale.x() + offset.0,
+                y: mouse_pos.y() * viewport.height_px as f32 / viewport.content_scale.y(),
+            };
 
-            let mut events = Vec::new();
-
-            if mem::take(&mut self.pointer_gone_pending) {
-                events.push(Event::PointerGone);
-            }
-
-            for event in api.window_events() {
-                match event {
+            let mut events = api
+                .window_events()
+                .into_iter()
+                .filter_map(|event| match event {
                     WindowEvent::KeyEvent(key_event) => {
-                        events.extend(map_key(key_event.key).map(|key| Event::Key {
+                        map_key(key_event.key).map(|key| Event::Key {
                             key,
                             physical_key: None,
                             pressed: key_event.actions == plugin_h::PLUGIN_KEY_ACTION_PRESS as i32,
                             repeat: key_event.actions == plugin_h::PLUGIN_KEY_ACTION_REPEAT as i32,
                             modifiers: process_mods(key_event.mods),
-                        }))
+                        })
                     }
-                    WindowEvent::MouseButtonEvent(mouse_event)
-                        if mouse_event.mods as u32 & plugin_h::PLUGIN_MOD_FROM_TOUCH == 0 =>
-                    {
-                        events.push(Event::PointerButton {
+                    WindowEvent::MouseButtonEvent(mouse_event) => {
+                        Some(Event::PointerButton {
                             pos: mouse_pos,
                             button: match mouse_event.key as u32 {
                                 plugin_h::PLUGIN_MOUSE_BUTTON_LEFT => PointerButton::Primary,
@@ -137,43 +113,25 @@ impl OdenEgui {
                                     PointerButton::Primary // TODO! look into this
                                 }
                             },
-                            pressed: mouse_event.actions
-                                == plugin_h::PLUGIN_KEY_ACTION_PRESS as i32,
+                            pressed: api.mouse_pressed_since_last_swap(),
                             modifiers: process_mods(mouse_event.mods),
                         })
                     }
-                    WindowEvent::MouseButtonEvent(_) => {}
-                    WindowEvent::ScrollEvent(scroll_event) => events.push(Event::Scroll(vec2(
+                    WindowEvent::ScrollEvent(scroll_event) => Some(Event::Scroll(vec2(
                         scroll_event.x as f32 * 10.0,
                         scroll_event.y as f32 * 10.0,
                     ))),
                     WindowEvent::CharEvent(char_event) => {
-                        events.push(Event::Text((char_event.c as u8 as char).to_string()))
+                        Some(Event::Text((char_event.c as u8 as char).to_string()))
                     }
-                    WindowEvent::FramebufferResizeEvent(_) => {}
-                    WindowEvent::WindowResizeEvent(_) => {}
-                    WindowEvent::WindowPosEvent(_) => {}
-                    WindowEvent::WindowFocusEvent(_) => {}
-                    #[cfg(target_os = "android")]
-                    WindowEvent::TouchInputEvent(touch)
-                        if touch.touch_id == 0 && touch.action != TouchInputAction::Move =>
-                    {
-                        let pos =
-                            Pos2::new(touch.pos.0 / scale.0, touch.pos.1 / scale.1) + egui_offset;
-                        let pressed = touch.action == TouchInputAction::Press;
-                        self.pointer_gone_pending = !pressed;
-                        events.push(Event::PointerMoved(pos));
-                        events.push(Event::PointerButton {
-                            pos,
-                            button: PointerButton::Primary,
-                            pressed,
-                            modifiers: Modifiers::default(),
-                        });
-                    }
-                    WindowEvent::TouchInputEvent(_) => {}
-                    WindowEvent::ShutdownEvent => {}
-                }
-            }
+                    WindowEvent::FramebufferResizeEvent(_) => None,
+                    WindowEvent::WindowResizeEvent(_) => None,
+                    WindowEvent::WindowPosEvent(_) => None,
+                    WindowEvent::WindowFocusEvent(_) => None,
+                    WindowEvent::TouchInputEvent(_) => None,
+                    WindowEvent::ShutdownEvent => None,
+                })
+                .collect::<Vec<_>>();
 
             if self.last_mouse_pos != mouse_pos {
                 events.push(Event::PointerMoved(mouse_pos));
@@ -241,7 +199,9 @@ impl OdenEgui {
 
         let (mut width, mut height) = api.target_size();
 
-        height -= self.draw_trim_y_px;
+        if self.gui_visible {
+            height -= (24.0 * self.pixels_per_point) as i32;
+        };
 
         width = width.max(1);
         height = height.max(1);

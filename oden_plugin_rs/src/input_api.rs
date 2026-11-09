@@ -3,9 +3,11 @@
 //! API for handling input from joysticks and gamepads.
 
 use crate::{
-    math, oden_global,
-    plugin_h::{OdenGamepadState_s, OdenHandTrackingState_s, OdenJoystickState_s},
-    JoystickState,
+    math,
+    plugin_h::{
+        OdenGamepadState_s, OdenHandTrackingState_s, OdenJoystickState_s, OdenPluginGlobalFunctions,
+    },
+    JoystickState, ODEN_GLOBAL,
 };
 
 #[cfg(feature = "glam_conversion")]
@@ -24,9 +26,11 @@ use glam;
 /// }
 /// ```
 pub fn is_joystick_present(joystick_id: i32) -> bool {
-    let Some(globals) = oden_global() else {
+    if unsafe { ODEN_GLOBAL.is_null() } {
         return false;
-    };
+    }
+
+    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
 
     if let Some(func) = globals.isJoystickPresent {
         unsafe { func(joystick_id) }
@@ -48,7 +52,11 @@ pub fn is_joystick_present(joystick_id: i32) -> bool {
 /// }
 /// ```
 pub fn joystick_state(joystick_id: i32) -> Option<JoystickState> {
-    let globals = oden_global()?;
+    if unsafe { ODEN_GLOBAL.is_null() } {
+        return None;
+    }
+
+    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
 
     if let Some(func) = globals.getJoystickState {
         let mut state = OdenJoystickState_s::default();
@@ -160,7 +168,11 @@ impl From<OdenGamepadState_s> for Gamepad {
 /// }
 /// ```
 pub fn gamepad_state(joystick_id: i32) -> Option<Gamepad> {
-    let globals = oden_global()?;
+    if unsafe { ODEN_GLOBAL.is_null() } {
+        return None;
+    }
+
+    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
 
     if let Some(func) = globals.getGamepadState {
         let mut state = OdenGamepadState_s::default();
@@ -189,7 +201,11 @@ pub fn gamepad_state(joystick_id: i32) -> Option<Gamepad> {
 /// }
 /// ```
 pub fn gamepad() -> Option<Gamepad> {
-    let globals = oden_global()?;
+    if unsafe { ODEN_GLOBAL.is_null() } {
+        return None;
+    }
+
+    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
 
     if let Some(func) = globals.getGamepad {
         let mut state = OdenGamepadState_s::default();
@@ -214,9 +230,11 @@ pub fn gamepad() -> Option<Gamepad> {
 /// add_gamepad_mapping("030000006d0400004fc2000000000000,Logitech G HUB G29 Driving Force Racing Wheel USB,platform:Windows,a:b0,b:b2,x:b1,y:b3,back:b7,guide:b24,start:b6,leftstick:b11,rightstick:b10,leftshoulder:b5,rightshoulder:b4,dpup:h0.1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,leftx:a0,lefttrigger:a2~,righttrigger:a1~,");
 /// ```
 pub fn add_gamepad_mapping(mapping: &str) -> bool {
-    let Some(globals) = oden_global() else {
+    if unsafe { ODEN_GLOBAL.is_null() } {
         return false;
-    };
+    }
+
+    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
 
     if let Some(func) = globals.addGamepadMapping {
         let mapping_c = std::ffi::CString::new(mapping).unwrap();
@@ -273,7 +291,11 @@ impl PowerState {
 /// }
 /// ```
 pub fn get_power_info() -> Option<(i32, i32, PowerState)> {
-    let globals = oden_global()?;
+    if unsafe { ODEN_GLOBAL.is_null() } {
+        return None;
+    }
+
+    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
 
     if let Some(func) = globals.getPowerInfo {
         let mut seconds = 0;
@@ -424,7 +446,11 @@ impl HandTrackingState {
 /// # }
 /// ```
 pub fn hand_tracking_state(hand: i32) -> Option<HandTrackingState> {
-    let globals = oden_global()?;
+    if unsafe { ODEN_GLOBAL.is_null() } {
+        return None;
+    }
+
+    let globals: &OdenPluginGlobalFunctions = unsafe { &*ODEN_GLOBAL };
 
     if let Some(func) = globals.getHandTrackingState {
         let mut state = OdenHandTrackingState_s::default();
