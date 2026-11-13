@@ -272,14 +272,6 @@ pub const ODEN_FAULT_OCULUS_DISCONNECTED: u32 = 0;
 pub const ODEN_FAULT_HMD_DISCONNECTED: u32 = 0;
 pub const ODEN_FAULT_HMD_REMOVED_FROM_HEAD: u32 = 1;
 pub const PLUGIN_TENSOR_SHAPE_MAX_DIMS: u32 = 8;
-pub const ODEN_JOYSTICK_POSE_AXIS: u32 = 64;
-pub const ODEN_JOYSTICK_REFERENCE_AXIS: u32 = 80;
-pub const ODEN_JOYSTICK_POSE_FLAGS_AXIS: u32 = 96;
-pub const ODEN_JOYSTICK_POSE_ORIENTATION: u32 = 1;
-pub const ODEN_JOYSTICK_POSE_POSITION: u32 = 2;
-pub const ODEN_JOYSTICK_POSE_VALID: u32 = 4;
-pub const ODEN_JOYSTICK_POSE_CALIBRATED: u32 = 8;
-pub const ODEN_JOYSTICK_POSE_RELATIVE_YAW: u32 = 16;
 pub const ODEN_HAND_JOINT_PALM: u32 = 0;
 pub const ODEN_HAND_JOINT_WRIST: u32 = 1;
 pub const ODEN_HAND_JOINT_THUMB_METACARPAL: u32 = 2;
@@ -1055,8 +1047,6 @@ pub type OdenGetGamepadStateFunc = ::std::option::Option<
 pub type OdenGetGamepadStateV2Func = ::std::option::Option<
     unsafe extern "C" fn(joystickId: i32, gamepadStateOut: *mut OdenGamepadStateV2) -> bool,
 >;
-pub type OdenSetJoystickMotionEnabledFunc =
-    ::std::option::Option<unsafe extern "C" fn(joystickId: i32, enabled: bool) -> bool>;
 pub type OdenGetGamepadFunc =
     ::std::option::Option<unsafe extern "C" fn(gamepadStateOut: *mut OdenGamepadState) -> bool>;
 pub type OdenAddGamepadMappingFunc =
@@ -1115,8 +1105,7 @@ pub struct OdenPluginGlobalFunctions_s {
     pub getHandTrackingState: OdenGetHandTrackingStateFunc,
     pub handToWorld: OdenHandToWorldFunc,
     pub handToLocal: OdenHandToLocalFunc,
-    pub setJoystickMotionEnabled: OdenSetJoystickMotionEnabledFunc,
-    pub reserved: [*mut ::std::os::raw::c_void; 224usize],
+    pub reserved: [*mut ::std::os::raw::c_void; 225usize],
 }
 impl Default for OdenPluginGlobalFunctions_s {
     fn default() -> Self {
