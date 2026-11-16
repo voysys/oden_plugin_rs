@@ -155,7 +155,18 @@ load in Oden:
 Each example is its own standalone crate that depends on `oden_plugin_rs` by
 relative path, so they build straight from a checkout of this repository.
 
+## C and C++
+
+[`include/plugin.h`](include/plugin.h) is the Oden plugin C API that Oden
+itself is built against. Plugins written in C or C++ add `include/` to the
+include path and `#include <plugin.h>`. The Rust bindings in
+[`oden_plugin_rs/bindings/`](oden_plugin_rs/bindings) are generated from this
+header with bindgen. The header is under its own copyright notice at the top
+of the file, which permits using it to build Oden plugins; it is not covered
+by the 0BSD license of the rest of this repository.
+
 ## License
 
 Licensed under the [0BSD](https://opensource.org/licenses/0BSD) license. See
-[LICENSE](LICENSE).
+[LICENSE](LICENSE). [`include/plugin.h`](include/plugin.h) is the exception;
+see [C and C++](#c-and-c).
