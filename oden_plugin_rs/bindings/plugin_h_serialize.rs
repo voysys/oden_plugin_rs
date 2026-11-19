@@ -915,6 +915,7 @@ pub type OdenLogRawFunc = ::std::option::Option<
         ...
     ),
 >;
+pub type OdenLogMaxLevelFunc = ::std::option::Option<unsafe extern "C" fn() -> OdenLogLevel>;
 pub type OdenCopyFrameFunc = ::std::option::Option<
     unsafe extern "C" fn(src: OdenPluginVideoFrame, dst: OdenPluginVideoFrame) -> bool,
 >;
@@ -1087,7 +1088,8 @@ pub struct OdenPluginGlobalFunctions_s {
     pub logWarning: OdenLogWarningFunc,
     pub logError: OdenLogErrorFunc,
     pub logRaw: OdenLogRawFunc,
-    pub logReserved: [*mut ::std::os::raw::c_void; 15usize],
+    pub logMaxLevel: OdenLogMaxLevelFunc,
+    pub logReserved: [*mut ::std::os::raw::c_void; 14usize],
     pub copyFrame: OdenCopyFrameFunc,
     pub convertFrameToRgb: OdenConvertFrameToPackedRgbFunc,
     pub frameReserved: [*mut ::std::os::raw::c_void; 16usize],

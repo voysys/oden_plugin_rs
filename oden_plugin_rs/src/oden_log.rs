@@ -4,7 +4,7 @@ use crate::plugin_h::{
     OdenLogLevel_e_OdenLogDebug, OdenLogLevel_e_OdenLogError, OdenLogLevel_e_OdenLogInfo,
     OdenLogLevel_e_OdenLogTrace, OdenLogLevel_e_OdenLogWarning,
 };
-use log::{Level, Record};
+use log::{Level, LevelFilter, Record};
 use std::ffi::CString;
 
 struct OdenLogger;
@@ -12,11 +12,15 @@ struct OdenLogger;
 static ODEN_LOGGER: OdenLogger = OdenLogger;
 
 impl log::Log for OdenLogger {
-    fn enabled(&self, _metadata: &log::Metadata) -> bool {
-        true
+    fn enabled(&self, metadata: &log::Metadata) -> bool {
+        metadata.level() <= oden_max_level()
     }
 
     fn log(&self, record: &Record) {
+        if !self.enabled(record.metadata()) {
+            return;
+        }
+
         let file = record.file().unwrap_or("");
         let line = record.line().unwrap_or(0);
         let module = record.module_path().unwrap_or("");
@@ -67,6 +71,22 @@ impl log::Log for OdenLogger {
 pub fn init() -> Result<(), log::SetLoggerError> {
     log::set_max_level(log::LevelFilter::Trace);
     log::set_logger(&ODEN_LOGGER)
+}
+
+fn oden_max_level() -> LevelFilter {
+    let Some(oden_log_max_level) = oden_global().and_then(|globals| globals.logMaxLevel) else {
+        return LevelFilter::Trace;
+    };
+
+    #[allow(non_upper_case_globals)]
+    match unsafe { oden_log_max_level() } {
+        OdenLogLevel_e_OdenLogTrace => LevelFilter::Trace,
+        OdenLogLevel_e_OdenLogDebug => LevelFilter::Debug,
+        OdenLogLevel_e_OdenLogInfo => LevelFilter::Info,
+        OdenLogLevel_e_OdenLogWarning => LevelFilter::Warn,
+        OdenLogLevel_e_OdenLogError => LevelFilter::Error,
+        _ => LevelFilter::Off,
+    }
 }
 
 pub fn log(level: OdenLogLevel, file: &str, line: i32, module: &str, message: &str) {

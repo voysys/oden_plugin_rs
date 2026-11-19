@@ -615,6 +615,7 @@ typedef void (*OdenLogRawFunc)(
     const char * module,
     const char * message,
     ...);
+typedef OdenLogLevel (*OdenLogMaxLevelFunc)(void);
 
 typedef bool (*OdenCopyFrameFunc)(OdenPluginVideoFrame src, OdenPluginVideoFrame dst);
 
@@ -777,7 +778,8 @@ typedef struct OdenPluginGlobalFunctions_s {
     OdenLogWarningFunc logWarning;
     OdenLogErrorFunc logError;
     OdenLogRawFunc logRaw;
-    void * logReserved[15];
+    OdenLogMaxLevelFunc logMaxLevel;
+    void * logReserved[14];
 
     // Frame
     OdenCopyFrameFunc copyFrame;
